@@ -10,6 +10,7 @@ A ideia é construir uma página de competição muito simples que incentiva as 
 - Quando o formulário é enviado, o usuário ganha um ponto e será direcionado para uma página com opção de compartilhar o link especial;
 - Quando as pessoas chegam à página da competição através do link especial, o autor original ganha um ponto extra;
 - Após o término da competição, gerar uma tabela dos vencedores;
+- Enviar notificação via e-mail para os ganhadores e para cada vez que alguém fizer um ponto a partir do link filiado.
 - Seja original, projetos suspeitos de serem copiados serão descartados
 - Queremos ver seu codigo, não o de outros.
 - Criar coleção no Postman (seu teste será testado por aqui).
