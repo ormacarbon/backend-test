@@ -8,11 +8,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config struct to abstract the environment variables
 type Config struct {
 	POSTGRES_HOST     string
 	POSTGRES_PORT     int
 	POSTGRES_USER     string
 	POSTGRES_PASSWORD string
+	POSTGRES_DB	   string
 }
 
 func NewConfig() (*Config, error) {
@@ -26,11 +28,14 @@ func NewConfig() (*Config, error) {
 		POSTGRES_PORT: getEnvAsInt("POSTGRES_PORT", 5432),
 		POSTGRES_USER: getEnv("POSTGRES_USER", "root"),
 		POSTGRES_PASSWORD: getEnv("POSTGRES_PASSWORD", "root"),
+		POSTGRES_DB: getEnv("POSTGRES_DB", "gss-db"),
+
 	}
 
 	return config, nil
 }
 
+// Auxiliar functions to get the environment variables
 func getEnv(key, defaultValue string) string {
     if value, exists := os.LookupEnv(key); exists {
         return value
