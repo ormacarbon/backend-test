@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-
+// Concrete implementation of the IUserRepository interface
 func NewPostgresUserRepository(db *gorm.DB) *PostgresUserRepository {
 	return &PostgresUserRepository{db: db}
 }
