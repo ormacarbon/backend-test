@@ -7,6 +7,7 @@ import (
 )
 
 // UserPresenter is a struct that is going to be used to present the user data in a controlled way
+// As a minor "business logic", I opted to not return the phone number of the user
 type UserPresenter struct {
 	ID	   uint   `json:"id"`
 	FullName   string `json:"full_name"`
