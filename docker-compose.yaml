@@ -1,0 +1,17 @@
+version: "3.1"
+
+services:
+  carbon_offset_db:
+    image: postgres:alpine3.20
+    restart: "no"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: carbon_offset
+    networks:
+      - carbon_offset_network
+    ports:
+      - 5432:5432
+
+networks:
+  carbon_offset_network:
