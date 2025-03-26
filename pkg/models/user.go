@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// User struct to model the user entity
 type User struct {
 	gorm.Model
 	ID uint `json:"id" gorm:"primary_key"`
