@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/joaooliveira247/backend-test/src/utils"
 )
 
@@ -21,4 +22,8 @@ func (user *Users) Validate() error {
 		return errors.New("invalid phone format")
 	}
 	return nil
+}
+
+func (user *Users) IsEmpty() bool {
+	return user.ID == uuid.Nil
 }
