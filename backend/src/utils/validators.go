@@ -20,3 +20,9 @@ func EmailValidator(email string) bool {
 	mxRecords, err := net.LookupMX(parts[1])
 	return err == nil && len(mxRecords) > 0
 }
+
+func IsPhoneNumber(phone string) bool {
+	re := regexp.MustCompile(`^\+55\d{11}$`)
+
+	return re.MatchString(phone)
+}
