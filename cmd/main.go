@@ -5,8 +5,10 @@ import (
 	"gss-backend/api/routes"
 	"gss-backend/pkg/config"
 	"gss-backend/pkg/models"
-	repositories "gss-backend/pkg/repositories/user"
-	services "gss-backend/pkg/services/user"
+	pointsRepo "gss-backend/pkg/repositories/points"
+	userRepo "gss-backend/pkg/repositories/user"
+	pointsService "gss-backend/pkg/services/points"
+	userService "gss-backend/pkg/services/user"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -50,7 +52,7 @@ func main() {
 	fmt.Println("Connected to the database!")
 
 	// Setting up Migrations
-	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.User{}, &models.Points{})
 
 	if err != nil {
 		log.Fatal("Error running migrations", err)
@@ -64,14 +66,17 @@ func main() {
 		return c.SendString("GSS Gateway API is up and running! 🚀")
 	})
 
-	// Instatiating the User Repo
-	userRepo := repositories.NewPostgresUserRepository(db)
+	// Instatiating Repositories
+	userRepo := userRepo.NewPostgresUserRepository(db)
+	pointsRepo := pointsRepo.NewPostgresPointsRepository(db)
 
-	// Setting up the User Service
-	userService := services.NewUserService(userRepo)
+	// Instatiating Services
+	userService := userService.NewUserService(userRepo)
+	pointsService := pointsService.NewPointsService(pointsRepo)
 
 	api := app.Group("/api")
 	routes.UserRouter(api, userService)
+	routes.PointsRouter(api, pointsService)
 
 	log.Fatal(app.Listen(":3000"))
 
