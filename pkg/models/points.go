@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Structs that represents the points the user gains every time someone access the user's referral link
 type Points struct {
 	gorm.Model
 	ID uint `json:"id" gorm:"primary_key"`
