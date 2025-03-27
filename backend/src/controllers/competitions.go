@@ -10,3 +10,10 @@ type CompetitionsController struct {
 	PointRepository       repositories.PointsRepository
 }
 
+func NewCompetitionsController(
+	userRepo repositories.UsersRepository,
+	compRepo repositories.CompetitionsRepository,
+	pointRepo repositories.PointsRepository,
+) *CompetitionsController {
+	return &CompetitionsController{userRepo, compRepo, pointRepo}
+}
