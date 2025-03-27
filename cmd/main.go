@@ -19,18 +19,14 @@ import (
 
 func main() {
 	// Loading configuration
+	log.Println("Loading configuration...")
 	config, err := config.NewConfig()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Printing .env variables to see if they are loaded correctly
-	fmt.Println(config.POSTGRES_HOST)
-	fmt.Println(config.POSTGRES_PORT)
-	fmt.Println(config.POSTGRES_USER)
-	fmt.Println(config.POSTGRES_PASSWORD)
-	fmt.Println(config.POSTGRES_DB)
+	log.Println("Configuration loaded!")
 
 	// Setting up Postgres DSN
 	dsn := fmt.Sprintf((
@@ -43,20 +39,26 @@ func main() {
 	)
 
 	// Connecting to the database
+	log.Println("Connecting to the database...")
+	
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Connected to the database!")
+	log.Println("Connected to the database!")
 
 	// Setting up Migrations
+	log.Println("Running migrations...")
+
 	err = db.AutoMigrate(&models.User{}, &models.Points{})
 
 	if err != nil {
 		log.Fatal("Error running migrations", err)
 	}
+
+	log.Println("Migrations complete!")
 
 	// Setting up Fiber
 	app := fiber.New()
