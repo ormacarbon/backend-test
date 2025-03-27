@@ -71,7 +71,7 @@ func main() {
 	pointsRepo := pointsRepo.NewPostgresPointsRepository(db)
 
 	// Instatiating Services
-	userService := userService.NewUserService(userRepo)
+	userService := userService.NewUserService(userRepo, pointsRepo)
 	pointsService := pointsService.NewPointsService(pointsRepo)
 
 	api := app.Group("/api")

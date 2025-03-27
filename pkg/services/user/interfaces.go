@@ -2,7 +2,8 @@ package services
 
 import (
 	"gss-backend/pkg/models"
-	repositories "gss-backend/pkg/repositories/user"
+	pointsRepo "gss-backend/pkg/repositories/points"
+	userRepo "gss-backend/pkg/repositories/user"
 )
 
 type IUserService interface {
@@ -12,5 +13,6 @@ type IUserService interface {
 }
 
 type UserService struct {
-	repository repositories.IUserRepository
+	pointsRepo pointsRepo.IPointsRepository
+	userRepo userRepo.IUserRepository
 }
