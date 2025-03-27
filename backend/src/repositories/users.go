@@ -22,3 +22,15 @@ func (repository *UsersRepository) Create(user *models.Users) (string, error) {
 
 	return user.AffiliateCode, nil
 }
+
+func (repository *UsersRepository) GetUserByAffiliateCode(
+	code string,
+) (models.Users, error) {
+	var user models.Users
+
+	if err := repository.db.First(&user, "affiliate_code = ?", code).Error; err != nil {
+		return models.Users{}, err
+	}
+
+	return user, nil
+}
