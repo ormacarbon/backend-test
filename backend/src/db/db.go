@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/joaooliveira247/backend-test/src/config"
+	"github.com/joaooliveira247/backend-test/src/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,4 +18,11 @@ func GetDBConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func CreateTables(db *gorm.DB) error {
+	if err := db.AutoMigrate(&models.Users{}, &models.Competitions{}, &models.Points{}); err != nil {
+		return err
+	}
+	return nil
 }
