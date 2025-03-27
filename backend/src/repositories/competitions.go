@@ -25,3 +25,13 @@ func (repository *CompetitionsRepository) Create(
 
 	return competiotion.ID, nil
 }
+
+func (repository *CompetitionsRepository) GetActiveCompetition() (models.Competitions, error) {
+	var competition models.Competitions
+
+	if err := repository.db.First(&competition, "status = true").Error; err != nil {
+		return models.Competitions{}, err
+	}
+
+	return competition, nil
+}
