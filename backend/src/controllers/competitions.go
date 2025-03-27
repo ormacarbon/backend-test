@@ -49,3 +49,26 @@ func (ctrl *CompetitionsController) Create(ctx *gin.Context) {
 		},
 	)
 }
+
+func (ctrl *CompetitionsController) GetCompetition(ctx *gin.Context) {
+	// main request for main screen
+	compCheck, _ := ctrl.CompetitionRepository.GetActiveCompetition()
+
+	if !compCheck.IsEmpty() {
+		if code := ctx.Query("affiliateCode"); code != "" {
+			user, _ := ctrl.UserRepository.GetUserByAffiliateCode(code)
+
+			if !user.IsEmpty() {
+				ctrl.PointRepository.AddPoint(
+					&models.Points{
+						UserID:        user.ID,
+						CompetitionID: compCheck.ID,
+					},
+				)
+			}
+		}
+		ctx.JSON(http.StatusOK, compCheck)
+		return
+	}
+	ctx.JSON(http.StatusNoContent, nil)
+}
