@@ -35,3 +35,21 @@ func (repository *CompetitionsRepository) GetActiveCompetition() (models.Competi
 
 	return competition, nil
 }
+
+func (repository *CompetitionsRepository) CloseCompetition(
+	competitionID uuid.UUID,
+) error {
+	var competition models.Competitions
+
+	if err := repository.db.First(&competition, "id = ?", competitionID).Error; err != nil {
+		return err
+	}
+
+	competition.Status = false
+
+	if err := repository.db.Save(&competition).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
