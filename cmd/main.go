@@ -76,11 +76,14 @@ func main() {
 	userService := userService.NewUserService(userRepo, userReferralRepo)
 	userReferralService := userReferralService.NewUserReferralService(userRepo, userReferralRepo)
 
+	// Setting up routes
 	api := app.Group("/api")
 	routes.UserRouter(api, userService)
 	routes.UserReferralRouter(api, userReferralService)
 
-	log.Fatal(app.Listen(":3000"))
+	// Starting the server
+	port := fmt.Sprintf(":%s", config.FIBER_PORT) 
+	log.Fatal(app.Listen(port))
 
 	
 }
