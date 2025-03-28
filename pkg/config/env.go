@@ -14,8 +14,8 @@ type Config struct {
 	POSTGRES_PORT     int
 	POSTGRES_USER     string
 	POSTGRES_PASSWORD string
-	POSTGRES_DB	   string
-	FIBER_PORT        int
+	POSTGRES_DB	      string
+	FIBER_PORT     	  string
 }
 
 func NewConfig() (*Config, error) {
@@ -30,7 +30,7 @@ func NewConfig() (*Config, error) {
 		POSTGRES_USER: getEnv("POSTGRES_USER", "root"),
 		POSTGRES_PASSWORD: getEnv("POSTGRES_PASSWORD", "root"),
 		POSTGRES_DB: getEnv("POSTGRES_DB", "gss-db"),
-		FIBER_PORT: getEnvAsInt("FIBER_PORT", 3000),
+		FIBER_PORT: getEnv("FIBER_PORT", "3000"),
 
 	}
 
