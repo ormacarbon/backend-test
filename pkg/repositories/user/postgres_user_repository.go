@@ -26,4 +26,10 @@ func (r *PostgresUserRepository) FindByID(id uint) (*models.User, error) {
 	var user models.User
 	result := r.db.First(&user, id)
 	return &user, result.Error
-}	
+}
+
+func (r *PostgresUserRepository) FindByReferralCode(referralCode string) (*models.User, error) {
+	var user models.User
+	result := r.db.Where("referral_code = ?", referralCode).First(&user)
+	return &user, result.Error
+}

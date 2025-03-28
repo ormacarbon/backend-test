@@ -5,10 +5,10 @@ import (
 	"gss-backend/api/routes"
 	"gss-backend/pkg/config"
 	"gss-backend/pkg/models"
-	pointsRepo "gss-backend/pkg/repositories/points"
 	userRepo "gss-backend/pkg/repositories/user"
-	pointsService "gss-backend/pkg/services/points"
+	userReferralRepo "gss-backend/pkg/repositories/user_referral"
 	userService "gss-backend/pkg/services/user"
+	userReferralService "gss-backend/pkg/services/user_referral"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -52,7 +52,7 @@ func main() {
 	// Setting up Migrations
 	log.Println("Running migrations...")
 
-	err = db.AutoMigrate(&models.User{}, &models.Points{})
+	err = db.AutoMigrate(&models.User{}, &models.UserReferral{})
 
 	if err != nil {
 		log.Fatal("Error running migrations", err)
@@ -70,15 +70,15 @@ func main() {
 
 	// Instatiating Repositories
 	userRepo := userRepo.NewPostgresUserRepository(db)
-	pointsRepo := pointsRepo.NewPostgresPointsRepository(db)
+	userReferralRepo := userReferralRepo.NewPostgresUserReferralRepository(db)
 
 	// Instatiating Services
-	userService := userService.NewUserService(userRepo, pointsRepo)
-	pointsService := pointsService.NewPointsService(pointsRepo)
+	userService := userService.NewUserService(userRepo, userReferralRepo)
+	userReferralService := userReferralService.NewUserReferralService(userRepo, userReferralRepo)
 
 	api := app.Group("/api")
 	routes.UserRouter(api, userService)
-	routes.PointsRouter(api, pointsService)
+	routes.UserReferralRouter(api, userReferralService)
 
 	log.Fatal(app.Listen(":3000"))
 

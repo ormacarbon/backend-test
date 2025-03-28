@@ -1,4 +1,4 @@
-package presenter
+package presenters
 
 import (
 	"gss-backend/pkg/models"
@@ -7,11 +7,11 @@ import (
 )
 
 // UserPresenter is a struct that is going to be used to present the user data in a controlled way
-// As a minor "business logic", I opted to not return the phone number of the user
+// As a minor "business logic", I opted to not return the phone number and the email of the user
 type UserPresenter struct {
 	ID	   uint   `json:"id"`
 	FullName   string `json:"full_name"`
-	Email      string `json:"email"`
+	ReferralCode string `json:"referral_code"`
 }
 
 // Functions to transform the user 'raw' data to presenters
@@ -19,7 +19,8 @@ func UserSuccessResponse(data *models.User) *fiber.Map {
 	user := UserPresenter{
 		ID:        data.ID,
 		FullName:  data.FullName,
-		Email:     data.Email,
+		ReferralCode: data.ReferralCode,
+
 	}
 
 	return &fiber.Map{
@@ -36,7 +37,7 @@ func UsersSuccessResponse(data *[]models.User) *fiber.Map {
 		users = append(users, UserPresenter{
 			ID:        user.ID,
 			FullName:  user.FullName,
-			Email:     user.Email,
+			ReferralCode: user.ReferralCode,
 		})
 	}
 
