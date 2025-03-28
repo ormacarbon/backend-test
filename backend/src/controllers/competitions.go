@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/joaooliveira247/backend-test/src/models"
 	"github.com/joaooliveira247/backend-test/src/repositories"
+	"github.com/joaooliveira247/backend-test/src/services"
 	"gorm.io/gorm"
 )
 
@@ -67,6 +69,14 @@ func (ctrl *CompetitionsController) GetCompetition(ctx *gin.Context) {
 						UserID:        user.ID,
 						CompetitionID: compCheck.ID,
 					},
+				)
+				services.SendEmail(
+					user.Email,
+					"Carbon Offset Competition",
+					fmt.Sprintf(
+						"+1 point using your affiliate code: %s",
+						code,
+					),
 				)
 			}
 		}
