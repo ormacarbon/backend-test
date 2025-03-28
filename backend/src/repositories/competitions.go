@@ -53,3 +53,29 @@ func (repository *CompetitionsRepository) CloseCompetition(
 
 	return nil
 }
+
+func (repository *CompetitionsRepository) GetCompetitionReport(
+	competitionID uuid.UUID,
+) ([]models.CompetitionReport, error) {
+	rawQuery := `
+SELECT 
+    u.name, 
+    u.email, 
+    u.phone, 
+    COUNT(*) AS points 
+FROM points p
+INNER JOIN users u ON p.user_id = u.id 
+WHERE p.competition_id = ? 
+GROUP BY u.name, u.email, u.phone 
+ORDER BY points DESC 
+LIMIT 10;
+	`
+
+	var reports []models.CompetitionReport
+
+	if err := repository.db.Raw(rawQuery, competitionID).Scan(&reports).Error; err != nil {
+		return nil, err
+	}
+
+	return reports, nil
+}
