@@ -31,5 +31,6 @@ func CompetitionsRoute(eng *gin.Engine) {
 		competitionsGroup.POST("/", controller.Create)
 		competitionsGroup.GET("/", controller.GetCompetition)
 		competitionsGroup.PUT("/", controller.CloseCompetition)
+		competitionsGroup.GET("/reports/", controller.GetCompetitionReport)
 	}
 }
