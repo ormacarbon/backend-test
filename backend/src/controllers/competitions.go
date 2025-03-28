@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -114,6 +115,24 @@ func (ctrl *CompetitionsController) CloseCompetition(ctx *gin.Context) {
 			gin.H{"error": "closed competition error", "details": err.Error()},
 		)
 		return
+	}
+
+	winners, err := ctrl.CompetitionRepository.GetCompetitionReport(compID)
+
+	if err != nil {
+		log.Printf("error pick winners: %v", err)
+	}
+
+	for i, report := range winners {
+		services.SendEmail(
+			report.Email,
+			"Carbon Offset Competition Ended",
+			fmt.Sprintf(
+				"Congratulations Carbon Offset Competition: %s ended, your position was %d",
+				compID,
+				i + 1,
+			),
+		)
 	}
 
 	ctx.JSON(http.StatusNoContent, nil)
