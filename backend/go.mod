@@ -3,6 +3,7 @@ module github.com/joaooliveira247/backend-test
 go 1.24.1
 
 require (
+	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
