@@ -5,14 +5,20 @@ import (
 	"gss-backend/pkg/models"
 	userRepo "gss-backend/pkg/repositories/user"
 	userReferralRepo "gss-backend/pkg/repositories/user_referral"
+	emailService "gss-backend/pkg/services/email"
 	"gss-backend/pkg/utils"
 )
 
 // Instatiate a new UserService
-func NewUserService(userRepo userRepo.IUserRepository, userReferralRepo userReferralRepo.IUserReferralRepository) *UserService {
+func NewUserService(
+	userRepo userRepo.IUserRepository,
+	userReferralRepo userReferralRepo.IUserReferralRepository,
+	emailService emailService.IEmailService ) *UserService {
 	return &UserService{
 		userRepo: userRepo,
 		userReferralRepo: userReferralRepo,
+		emailService: emailService,
+
 	}
 }
 
@@ -32,6 +38,13 @@ func (s *UserService) Create(userDto *dtos.CreateUserDTO) (*models.User, error) 
 
 	// Create a new user record in the database
 	createdUser, err := s.userRepo.Create(&newUser)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Send welcome email to the user
+	err = s.emailService.SendWelcomeEmail(createdUser.Email)
 
 	if err != nil {
 		return nil, err

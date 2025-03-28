@@ -16,6 +16,11 @@ type Config struct {
 	POSTGRES_PASSWORD string
 	POSTGRES_DB	      string
 	FIBER_PORT     	  string
+	SMTP_EMAIL         string
+	SMTP_HOST          string
+	SMTP_PORT          int
+	SMTP_USER          string
+	SMTP_PASSWORD      string
 }
 
 func NewConfig() (*Config, error) {
@@ -31,6 +36,11 @@ func NewConfig() (*Config, error) {
 		POSTGRES_PASSWORD: getEnv("POSTGRES_PASSWORD", "root"),
 		POSTGRES_DB: getEnv("POSTGRES_DB", "gss-db"),
 		FIBER_PORT: getEnv("FIBER_PORT", "3000"),
+		SMTP_EMAIL: getEnv("SMTP_EMAIL", ""),
+		SMTP_HOST: getEnv("SMTP_HOST", ""),
+		SMTP_PORT: getEnvAsInt("SMTP_PORT", 587),
+		SMTP_USER: getEnv("SMTP_USER", ""),
+		SMTP_PASSWORD: getEnv("SMTP_PASSWORD", ""),
 
 	}
 

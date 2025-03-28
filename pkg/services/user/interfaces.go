@@ -5,6 +5,7 @@ import (
 	"gss-backend/pkg/models"
 	userRepo "gss-backend/pkg/repositories/user"
 	userReferralRepo "gss-backend/pkg/repositories/user_referral"
+	emailService "gss-backend/pkg/services/email"
 )
 
 type IUserService interface {
@@ -17,4 +18,5 @@ type IUserService interface {
 type UserService struct {
 	userRepo userRepo.IUserRepository
 	userReferralRepo userReferralRepo.IUserReferralRepository
+	emailService emailService.IEmailService
 }

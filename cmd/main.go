@@ -7,6 +7,7 @@ import (
 	"gss-backend/pkg/models"
 	userRepo "gss-backend/pkg/repositories/user"
 	userReferralRepo "gss-backend/pkg/repositories/user_referral"
+	emailService "gss-backend/pkg/services/email"
 	userService "gss-backend/pkg/services/user"
 	userReferralService "gss-backend/pkg/services/user_referral"
 	"log"
@@ -73,7 +74,15 @@ func main() {
 	userReferralRepo := userReferralRepo.NewPostgresUserReferralRepository(db)
 
 	// Instatiating Services
-	userService := userService.NewUserService(userRepo, userReferralRepo)
+	emailConfig := emailService.EmailConfig{
+		SMTPEmail: config.SMTP_EMAIL,
+		SMTPHost: config.SMTP_HOST,
+		SMTPPort: config.SMTP_PORT,
+		SMTPUser: config.SMTP_USER,
+		SMTPPassword: config.SMTP_PASSWORD,
+	}
+	emailService := emailService.NewEmailService(emailConfig)
+	userService := userService.NewUserService(userRepo, userReferralRepo, emailService)
 	userReferralService := userReferralService.NewUserReferralService(userRepo, userReferralRepo)
 
 	// Setting up routes
