@@ -108,3 +108,37 @@ func (ctrl *CompetitionsController) CloseCompetition(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusNoContent, nil)
 }
+
+func (ctrl *CompetitionsController) GetCompetitionReport(ctx *gin.Context) {
+	compID, err := uuid.Parse(ctx.Query("ID"))
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid id format", "details": err.Error(),
+		})
+		return
+	}
+
+	comp, _ := ctrl.CompetitionRepository.GetCompetitionByID(compID)
+
+	if comp.Status {
+		ctx.JSON(http.StatusConflict, gin.H{"error": "competition not closed"})
+		return
+	}
+
+	reports, err := ctrl.CompetitionRepository.GetCompetitionReport(compID)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "gen competition report", "details": err.Error(),
+		})
+		return
+	}
+
+	if reports == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "competiton not found"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, reports)
+}
