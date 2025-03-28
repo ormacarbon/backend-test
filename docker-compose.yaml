@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - DATABASE_URL= host=carbon_offset_db user=user password=passwd dbname=carbon_offset port=5432 sslmode=disable
+      - SERVICE_EMAIL=${SERVICE_EMAIL}
+      - PASSWORD_SERVICE_EMAIL=${PASSWORD_SERVICE_EMAIL}
     networks:
       - carbon_offset_network
     ports:
