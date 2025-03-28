@@ -36,6 +36,16 @@ func (repository *CompetitionsRepository) GetActiveCompetition() (models.Competi
 	return competition, nil
 }
 
+func (repository *CompetitionsRepository) GetCompetitionByID(competitionID uuid.UUID) (models.Competitions, error) {
+	var competition models.Competitions
+
+	if err := repository.db.First(&competition, "id = ?", competitionID).Error; err != nil {
+		return models.Competitions{}, err
+	}
+
+	return competition, nil
+}
+
 func (repository *CompetitionsRepository) CloseCompetition(
 	competitionID uuid.UUID,
 ) error {
