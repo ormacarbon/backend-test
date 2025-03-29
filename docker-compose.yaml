@@ -1,0 +1,32 @@
+version: "3.1"
+
+services:
+  carbon_offset_api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL= host=carbon_offset_db user=user password=passwd dbname=carbon_offset port=5432 sslmode=disable
+      - SERVICE_EMAIL=${SERVICE_EMAIL}
+      - PASSWORD_SERVICE_EMAIL=${PASSWORD_SERVICE_EMAIL}
+    networks:
+      - carbon_offset_network
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+
+  carbon_offset_db:
+    image: postgres:alpine3.20
+    restart: "no"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: carbon_offset
+    networks:
+      - carbon_offset_network
+    ports:
+      - 5432:5432
+
+networks:
+  carbon_offset_network:
