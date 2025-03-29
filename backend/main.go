@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joaooliveira247/backend-test/src/config"
 	"github.com/joaooliveira247/backend-test/src/db"
+	"github.com/joaooliveira247/backend-test/src/middlewares"
 	"github.com/joaooliveira247/backend-test/src/routes"
 )
 
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	api := gin.Default()
+	api.Use(middlewares.RateLimiter)
 	routes.RegistryRoutes(api)
 
 	if err := api.Run(":8000"); err != nil {
