@@ -37,9 +37,8 @@ func NewConfig() (*Config, error) {
 		POSTGRES_DB: getEnv("POSTGRES_DB", "gss-db"),
 		FIBER_PORT: getEnv("FIBER_PORT", "3000"),
 		SMTP_EMAIL: getEnv("SMTP_EMAIL", ""),
-		SMTP_HOST: getEnv("SMTP_HOST", ""),
 		SMTP_PORT: getEnvAsInt("SMTP_PORT", 587),
-		SMTP_USER: getEnv("SMTP_USER", ""),
+		SMTP_HOST: getEnv("SMTP_HOST", ""),
 		SMTP_PASSWORD: getEnv("SMTP_PASSWORD", ""),
 
 	}

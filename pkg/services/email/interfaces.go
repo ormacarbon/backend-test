@@ -10,7 +10,6 @@ type EmailConfig struct {
 	SMTPEmail string
 	SMTPHost    string
 	SMTPPort    int
-	SMTPUser    string
 	SMTPPassword   string
 }
 

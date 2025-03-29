@@ -70,6 +70,13 @@ func (s *UserService) Create(userDto *dtos.CreateUserDTO) (*models.User, error) 
 		if err != nil {
 			return nil, err
 		}
+
+		// Send email to the referrer user
+		err = s.emailService.SendReferralLinkAccess(referrerUser.Email)
+
+		if err != nil {
+			return nil, err
+		}
 		
 	}
 

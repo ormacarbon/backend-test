@@ -28,7 +28,7 @@ func (s *EmailService) SendWelcomeEmail(email string) error {
 	dialer := gomail.NewDialer(
 		s.EmailConfig.SMTPHost,
 		s.EmailConfig.SMTPPort,
-		s.EmailConfig.SMTPUser,
+		s.EmailConfig.SMTPEmail,
 		s.EmailConfig.SMTPPassword,
 	)
 
@@ -53,7 +53,7 @@ func (s *EmailService) SendReferralLinkAccess(email string) error {
 	dialer := gomail.NewDialer(
 		s.EmailConfig.SMTPHost,
 		s.EmailConfig.SMTPPort,
-		s.EmailConfig.SMTPUser,
+		s.EmailConfig.SMTPEmail,
 		s.EmailConfig.SMTPPassword,
 	)
 

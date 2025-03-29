@@ -75,10 +75,9 @@ func main() {
 
 	// Instatiating Services
 	emailConfig := emailService.EmailConfig{
-		SMTPEmail: config.SMTP_EMAIL,
 		SMTPHost: config.SMTP_HOST,
 		SMTPPort: config.SMTP_PORT,
-		SMTPUser: config.SMTP_USER,
+		SMTPEmail: config.SMTP_EMAIL,
 		SMTPPassword: config.SMTP_PASSWORD,
 	}
 	emailService := emailService.NewEmailService(emailConfig)
