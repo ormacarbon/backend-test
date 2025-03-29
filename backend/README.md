@@ -248,6 +248,10 @@ curl -X GET localhost:8000/competitions/reports/?ID=d3dd9c62-5cc0-4b57-b341-ea18
 ```
 </details>
 
+## 🗄️ Database Diagram
+
+![database_diagram](https://i.imgur.com/CaK8HUN.png)
+
 ## 📦 Usage libraries:
 
 - [gin](github.com/gin-gonic/gin)
