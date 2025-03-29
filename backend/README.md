@@ -247,3 +247,15 @@ curl -X GET localhost:8000/competitions/reports/?ID=d3dd9c62-5cc0-4b57-b341-ea18
 -H "Content-Type: application/json" \
 ```
 </details>
+
+## 📦 Usage libraries:
+
+- [gin](github.com/gin-gonic/gin)
+
+- [gorm](https://gorm.io/)
+
+- [gorm/postgres](https://github.com/go-gorm/postgres)
+
+- [uuid](github.com/google/uuid)
+
+- [gomail](https://pkg.go.dev/gopkg.in/gomail.v2?utm_source=godoc)
