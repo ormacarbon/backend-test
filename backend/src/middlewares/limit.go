@@ -1,8 +1,10 @@
 package middlewares
 
 import (
+	"net/http"
 	"sync"
 
+	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 )
 
@@ -17,4 +19,19 @@ func getLimiter(ip string) *rate.Limiter {
 		return newLimiter
 	}
 	return limiter.(*rate.Limiter)
+}
+
+func RateLimiter(ctx *gin.Context) {
+	ip := ctx.ClientIP()
+	limiter := getLimiter(ip)
+
+	if !limiter.Allow() {
+		ctx.JSON(
+			http.StatusTooManyRequests,
+			gin.H{"error": "too many requests"},
+		)
+		ctx.Abort()
+		return
+	}
+	ctx.Next()
 }
