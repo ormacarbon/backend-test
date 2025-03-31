@@ -23,10 +23,5 @@ func (s *UserReferralService) FindLeaderboardScores() (*[]userReferralRepo.Leade
 		return nil, err
 	}
 
-	// Add 1 point to each Referral count
-	for _, score := range *leaderboardScores {
-		score.ReferralsCount += 1
-	}
-
 	return leaderboardScores, nil
 }
