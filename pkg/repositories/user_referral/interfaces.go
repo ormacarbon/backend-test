@@ -18,5 +18,5 @@ type PostgresUserReferralRepository struct {
 type LeaderboardScore struct {
 	ReferrerId uint
 	FullName string
-	ReferralsCount int
+	ReferralsCount uint
 }
