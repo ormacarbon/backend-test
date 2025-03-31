@@ -24,8 +24,9 @@ func (r *PostgresUserReferralRepository) FindLeaderboard() (*[]LeaderboardScore,
 	var leaderboardScores []LeaderboardScore
 
 	result := r.db.Table("user_referrals").
-        Select("referrer_id, COUNT(*) as referrals_count").
-        Group("referrer_id").
+        Select("user_referrals.referrer_id, users.full_name, COUNT(user_referrals.referrer_id) as referrals_count").
+		Joins("JOIN users ON users.id = user_referrals.referrer_id").
+        Group("user_referrals.referrer_id, users.full_name").
         Order("referrals_count DESC").
         Limit(10).
         Find(&leaderboardScores)
