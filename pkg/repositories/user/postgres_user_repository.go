@@ -28,6 +28,12 @@ func (r *PostgresUserRepository) FindByID(id uint) (*models.User, error) {
 	return &user, result.Error
 }
 
+func (r *PostgresUserRepository) FindByEmail(email string) (*models.User, error) {
+	var user models.User
+	result := r.db.Where("email = ?", email).First(&user)
+	return &user, result.Error
+}
+
 func (r *PostgresUserRepository) FindByReferralCode(referralCode string) (*models.User, error) {
 	var user models.User
 	result := r.db.Where("referral_code = ?", referralCode).First(&user)

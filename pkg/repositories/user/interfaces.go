@@ -11,6 +11,7 @@ type IUserRepository interface {
 	FindAll() (*[]models.User, error)
 	FindByID(id uint) (*models.User, error)
 	FindByReferralCode(referralCode string) (*models.User, error)
+	FindByEmail(email string) (*models.User, error)
 	Create(user *models.User) (*models.User, error)	
 }
 

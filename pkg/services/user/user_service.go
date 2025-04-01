@@ -15,6 +15,7 @@ func NewUserService(
 	userRepo userRepo.IUserRepository,
 	userReferralRepo userReferralRepo.IUserReferralRepository,
 	emailService emailService.IEmailService ) *UserService {
+
 	return &UserService{
 		userRepo: userRepo,
 		userReferralRepo: userReferralRepo,
@@ -25,6 +26,13 @@ func NewUserService(
 
 // Register a new user and create a new points record for the user
 func (s *UserService) Create(userDto *dtos.CreateUserDTO) (*models.User, error) {
+	// Check if user already exists
+	user, err := s.userRepo.FindByEmail(userDto.Email)
+
+	if err == nil  && user != nil {
+		return nil, fmt.Errorf("user with email %s already exists", userDto.Email)
+	}
+	
 	// Generate new referral code for the user
 	referralCode := utils.GenerateReferralCode()
 
