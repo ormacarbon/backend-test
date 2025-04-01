@@ -60,3 +60,28 @@ func (s *EmailService) SendReferralLinkAccess(email string) error {
 	// Sending the email
 	return dialer.DialAndSend(message)
 }
+
+// Send email to user when they are in the top 10 of the leaderboard
+func (s *EmailService) SendLeaderboardEmail(email string) error {
+	// Creating a new message
+	message := gomail.NewMessage()
+
+	// Setting email headers
+	message.SetHeader("From", s.EmailConfig.SMTPEmail)
+	message.SetHeader("To", email)
+	message.SetHeader("Subject", "Congratulations! You are in the top 10 of the leaderboard!")
+
+	// Setting email body
+	message.SetBody("text/plain", "Congratulations! You are in the top 10 of the leaderboard! Thanks for participating the competition!")
+
+	// Setting up SMTP configuration
+	dialer := gomail.NewDialer(
+		s.EmailConfig.SMTPHost,
+		s.EmailConfig.SMTPPort,
+		s.EmailConfig.SMTPEmail,
+		s.EmailConfig.SMTPPassword,
+	)
+
+	// Sending the email
+	return dialer.DialAndSend(message)
+}

@@ -13,13 +13,23 @@ type PointsPresenter struct {
 
 type LeaderboardScorePresenter struct {
 	ReferrerId uint   `json:"referrer_id"`
+	FullName   string `json:"full_name"`
 	ReferralsCount uint `json:"referrals_count"`
 }
 
 func LeaderboardScoreSuceessResponse(data *[]repo.LeaderboardScore) *fiber.Map {
+	var leaderboardScores []LeaderboardScorePresenter
+
+	for _, score := range *data {
+		leaderboardScores = append(leaderboardScores, LeaderboardScorePresenter{
+			ReferrerId: score.ReferrerId,
+			FullName:   score.FullName,
+			ReferralsCount: score.ReferralsCount,
+		})
+	}
 	return &fiber.Map{
 		"status": "success",
-		"data":   data,
+		"data":   leaderboardScores,
 		"error":  nil,
 	}
 }

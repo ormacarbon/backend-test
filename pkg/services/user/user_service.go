@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"gss-backend/api/dtos"
 	"gss-backend/pkg/models"
 	userRepo "gss-backend/pkg/repositories/user"
@@ -14,6 +15,7 @@ func NewUserService(
 	userRepo userRepo.IUserRepository,
 	userReferralRepo userReferralRepo.IUserReferralRepository,
 	emailService emailService.IEmailService ) *UserService {
+
 	return &UserService{
 		userRepo: userRepo,
 		userReferralRepo: userReferralRepo,
@@ -24,6 +26,13 @@ func NewUserService(
 
 // Register a new user and create a new points record for the user
 func (s *UserService) Create(userDto *dtos.CreateUserDTO) (*models.User, error) {
+	// Check if user already exists
+	user, err := s.userRepo.FindByEmail(userDto.Email)
+
+	if err == nil  && user != nil {
+		return nil, fmt.Errorf("user with email %s already exists", userDto.Email)
+	}
+	
 	// Generate new referral code for the user
 	referralCode := utils.GenerateReferralCode()
 
@@ -43,12 +52,15 @@ func (s *UserService) Create(userDto *dtos.CreateUserDTO) (*models.User, error) 
 		return nil, err
 	}
 
-	// Send welcome email to the user
-	err = s.emailService.SendWelcomeEmail(createdUser.Email)
+	// Send welcome email to the user asynchronously
+	go func() {
+		err := s.emailService.SendWelcomeEmail(createdUser.Email)
 
-	if err != nil {
-		return nil, err
-	}
+		if err != nil {
+			fmt.Printf("Failed to send welcome email to %s: %v\n", createdUser.Email, err)
+		}
+	}()
+	
 
 	// Create user referral record for the registered user
 	_, err = s.userReferralRepo.Create(createdUser.ID, createdUser.ID)
@@ -71,13 +83,13 @@ func (s *UserService) Create(userDto *dtos.CreateUserDTO) (*models.User, error) 
 			return nil, err
 		}
 
-		// Send email to the referrer user
-		err = s.emailService.SendReferralLinkAccess(referrerUser.Email)
-
-		if err != nil {
-			return nil, err
-		}
-		
+		// Send email to the referrer user asynchronously
+		go func() {
+			// Rewrote in another way so I can remind this also works hehe
+			if err := s.emailService.SendReferralLinkAccess(referrerUser.Email); err != nil {
+				fmt.Printf("Error sending referral link access email to %s: %v\n", referrerUser.Email, err)
+			}
+		}()
 	}
 
 	return createdUser, nil

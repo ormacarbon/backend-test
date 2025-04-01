@@ -82,7 +82,7 @@ func main() {
 	}
 	emailService := emailService.NewEmailService(emailConfig)
 	userService := userService.NewUserService(userRepo, userReferralRepo, emailService)
-	userReferralService := userReferralService.NewUserReferralService(userRepo, userReferralRepo)
+	userReferralService := userReferralService.NewUserReferralService(userRepo, userReferralRepo, emailService)
 
 	// Setting up routes
 	api := app.Group("/api")
