@@ -13,8 +13,11 @@ RUN go mod download
 # Copy source code
 COPY . .
 
+# Build the Go app
+RUN go build -o gss-backend ./cmd
+
 # Expose port 3001
 EXPOSE 3001
 
 # Run the application
-CMD ["go", "run", "./cmd"]
+CMD ["./gss-backend"]
