@@ -5,11 +5,7 @@ import (
 	"gss-backend/api/routes"
 	"gss-backend/pkg/config"
 	"gss-backend/pkg/models"
-	userRepo "gss-backend/pkg/repositories/user"
-	userReferralRepo "gss-backend/pkg/repositories/user_referral"
 	emailService "gss-backend/pkg/services/email"
-	userService "gss-backend/pkg/services/user"
-	userReferralService "gss-backend/pkg/services/user_referral"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -70,8 +66,8 @@ func main() {
 	})
 
 	// Instatiating Repositories
-	userRepo := userRepo.NewPostgresUserRepository(db)
-	userReferralRepo := userReferralRepo.NewPostgresUserReferralRepository(db)
+	repoContainer := NewRepositoryContainer(db)
+	
 
 	// Instatiating Services
 	emailConfig := emailService.EmailConfig{
@@ -80,14 +76,12 @@ func main() {
 		SMTPEmail: config.SMTP_EMAIL,
 		SMTPPassword: config.SMTP_PASSWORD,
 	}
-	emailService := emailService.NewEmailService(emailConfig)
-	userService := userService.NewUserService(userRepo, userReferralRepo, emailService)
-	userReferralService := userReferralService.NewUserReferralService(userRepo, userReferralRepo, emailService)
+	serviceContainer := NewServiceContainer(repoContainer, emailConfig)
 
 	// Setting up routes
 	api := app.Group("/api")
-	routes.UserRouter(api, userService)
-	routes.UserReferralRouter(api, userReferralService)
+	routes.UserRouter(api, serviceContainer.UserService)
+	routes.UserReferralRouter(api, serviceContainer.UserReferralService)
 
 	// Starting the server
 	port := fmt.Sprintf(":%s", config.FIBER_PORT) 
