@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the application
-CMD ["go", "run", "cmd/main.go"]
+CMD ["go", "run", "./cmd"]
