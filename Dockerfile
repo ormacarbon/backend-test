@@ -13,7 +13,7 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Expose port 3000
+# Expose port 3001
 EXPOSE 3001
 
 # Run the application
