@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Expose port 3000
-EXPOSE 3000
+EXPOSE 3001
 
 # Run the application
 CMD ["go", "run", "./cmd"]
