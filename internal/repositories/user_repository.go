@@ -9,6 +9,7 @@ type UserRepository interface {
 	CreateUser(user *models.User) error
 	FindUserByEmail(email string) (*models.User, error)
 	FindUserByReferralCode(code string) (*models.User, error)
+	FindTopUsersByPoints(limit int) ([]models.User, error)
 }
 
 type userRepository struct {
@@ -33,6 +34,12 @@ func (u *userRepository) FindUserByReferralCode(code string) (*models.User, erro
 	var user models.User
 	err := u.db.Where("referral_code = ?", code).First(&user).Error
 	return &user, err
+}
+
+func (u *userRepository) FindTopUsersByPoints(limit int) ([]models.User, error) {
+	var users []models.User
+	err := u.db.Order("points DESC").Limit(limit).Find(&users).Error
+	return users, err
 }
 
 func (u *userRepository) UpdateUser(user *models.User) error {
