@@ -24,7 +24,10 @@ func (u *UserHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Received referred_by:", input.ReferredBy) // Verifica se o campo foi enviado corretamente
+	referralCode := c.Query("ref")
+	if referralCode != "" {
+		input.ReferredBy = referralCode
+	}
 
 	user, err := u.userService.RegisterUser(input)
 	if err != nil {
