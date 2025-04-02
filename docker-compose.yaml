@@ -1,0 +1,42 @@
+services:
+  gss-api:
+    container_name: gss-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    restart: always
+    env_file:
+      - .env.production
+    depends_on:
+      gss-postgres-db:
+        condition: service_healthy
+    networks:
+      - gss-network
+
+  gss-postgres-db:
+    container_name: gss-postgres-db
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    restart: always
+    env_file:
+      - .env.production
+    volumes:
+      - ./volumes/gss-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gss-network
+
+volumes:
+  gss-db:
+    driver: local
+
+networks:
+  gss-network:
+    driver: bridge
