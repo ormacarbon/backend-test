@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -36,17 +37,23 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 
 	if dto.ReferredBy != "" {
 		referredUser, err := u.userRepo.FindUserByReferralCode(dto.ReferredBy)
-		if err == nil {
-			referredUser.Points++
-			u.userRepo.UpdateUser(referredUser)
-			user.ReferredBy = referredUser.Email
-			
-			emailService.SendEmail(
-				referredUser.Email,
-				"Congratulations! You earned an extra point!",
-				fmt.Sprintf("A new person signed up using your referral link! You now have %d points.", referredUser.Points),
-			)
+		if err != nil {
+			return nil, errors.New("invalid referral code")
 		}
+
+		referredUser.Points++
+		err = u.userRepo.UpdateUser(referredUser)
+		if err != nil {
+			return nil, err
+		}
+
+		user.ReferredBy = referredUser.Email
+
+		emailService.SendEmail(
+			referredUser.Email,
+			"Congratulations! You earned an extra point!",
+			fmt.Sprintf("A new person signed up using your referral link! You now have %d points.", referredUser.Points),
+		)
 	}
 
 	err := u.userRepo.CreateUser(&user)
@@ -62,4 +69,3 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 
 	return &user, nil
 }
-
