@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"github.com/gin-gonic/gin"
 	"github.com/jpeccia/go-backend-test/config"
 	"github.com/jpeccia/go-backend-test/internal/database/migrations"
@@ -15,14 +14,18 @@ func main() {
 	config.LoadEnv()
 	config.ConnectDatabase()
 	migrations.Migrate()
-	
+
 	r := gin.Default()
 
 	userRepo := repositories.NewUserRepository(config.DB)
-	userService := services.NewUserService(userRepo)
-	userHandler := handlers.NewUserHandler(userService)
 
-	routes.SetupRoutes(r, userHandler)
+	userService := services.NewUserService(userRepo)
+	competitionService := services.NewCompetitionService(userRepo)
+
+	userHandler := handlers.NewUserHandler(userService)
+	competitionHandler := handlers.NewCompetitionHandler(competitionService)
+
+	routes.SetupRoutes(r, userHandler, competitionHandler)
 
 	r.Run(":8080")
 }
