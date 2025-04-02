@@ -9,6 +9,7 @@ func SetupRoutes(r *gin.Engine, userHandler *handlers.UserHandler, competitionHa
 	api := r.Group("/api")
 	{
 		api.POST("/signup", userHandler.RegisterUser)
+		api.POST("/end-competition", competitionHandler.EndCompetition)
 		api.GET("/winners", competitionHandler.GetWinners) // Nova rota para vencedores
 	}
 }
