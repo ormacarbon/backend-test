@@ -28,3 +28,12 @@ func (u *userRepository) FindUserByEmail(email string) (*models.User, error) {
 	return &user, err
 }
 
+func (r *userRepository) FindUserByReferralCode(code string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("referral_code = ?", code).First(&user).Error
+	return &user, err
+}
+
+func (r *userRepository) UpdateUser(user *models.User) error {
+	return r.db.Save(user).Error
+}
