@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,5 +33,6 @@ func (u *UserHandler) RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
 		"referral_code": user.ReferralCode,
+		"share_link":    fmt.Sprintf("https://test.com/signup?ref=%s", user.ReferralCode),
 	})
 }
