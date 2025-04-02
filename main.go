@@ -8,6 +8,8 @@ import (
 	"github.com/jpeccia/go-backend-test/internal/repositories"
 	"github.com/jpeccia/go-backend-test/internal/routes"
 	"github.com/jpeccia/go-backend-test/internal/services"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -26,6 +28,8 @@ func main() {
 	competitionHandler := handlers.NewCompetitionHandler(competitionService)
 
 	routes.SetupRoutes(r, userHandler, competitionHandler)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Run(":8080")
 }
