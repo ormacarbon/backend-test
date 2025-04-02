@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/jpeccia/go-backend-test/config"
+	"github.com/jpeccia/go-backend-test/internal/database/migrations"
 	"github.com/jpeccia/go-backend-test/internal/handlers"
 	"github.com/jpeccia/go-backend-test/internal/repositories"
 	"github.com/jpeccia/go-backend-test/internal/routes"
@@ -18,6 +19,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	config.ConnectDatabase()
+	migrations.Migrate()
 	
 	r := gin.Default()
 
