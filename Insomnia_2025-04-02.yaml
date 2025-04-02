@@ -18,10 +18,10 @@ collection:
       mimeType: application/json
       text: |-
         {
-        		"name": "t harumi",
+        		"name": "name",
             "email": "test@email.com",
         	  "phone_number": "12342256789",
-        		"referred_by": "33ba65a2-7ea8-4118-880b-7f560e42d4ce"
+        		"referred_by": ""
         }
     headers:
       - name: Content-Type
