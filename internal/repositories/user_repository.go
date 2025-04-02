@@ -10,6 +10,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) (*models.User, error)
 	FindUserByReferralCode(code string) (*models.User, error)
 	FindTopUsersByPoints(limit int) ([]models.User, error)
+	UpdateUser(user *models.User) error
 }
 
 type userRepository struct {

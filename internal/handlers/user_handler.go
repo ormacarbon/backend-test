@@ -24,6 +24,8 @@ func (u *UserHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("Received referred_by:", input.ReferredBy) // Verifica se o campo foi enviado corretamente
+
 	user, err := u.userService.RegisterUser(input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
@@ -31,7 +33,7 @@ func (u *UserHandler) RegisterUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "User registered successfully",
+		"message":       "User registered successfully",
 		"referral_code": user.ReferralCode,
 		"share_link":    fmt.Sprintf("https://test.com/signup?ref=%s", user.ReferralCode),
 	})

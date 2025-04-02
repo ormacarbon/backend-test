@@ -38,7 +38,7 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 		referredUser, err := u.userRepo.FindUserByReferralCode(dto.ReferredBy)
 		if err == nil {
 			referredUser.Points++
-			u.userRepo.CreateUser(referredUser)
+			u.userRepo.UpdateUser(referredUser)
 
 			emailService.SendEmail(
 				referredUser.Email,
