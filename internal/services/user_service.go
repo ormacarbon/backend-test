@@ -39,7 +39,8 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 		if err == nil {
 			referredUser.Points++
 			u.userRepo.UpdateUser(referredUser)
-
+			user.ReferredBy = referredUser.Email
+			
 			emailService.SendEmail(
 				referredUser.Email,
 				"Congratulations! You earned an extra point!",
