@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/google/uuid"
 	"github.com/jpeccia/go-backend-test/internal/dto"
@@ -64,7 +65,7 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 	emailService.SendEmail(
 		user.Email,
 		"Welcome to the competition!",
-		fmt.Sprintf("Hi %s :), you have successfully registered! Share your link to earn points: https://test.com/signup?ref=%s", user.Name, user.ReferralCode),
+		fmt.Sprintf("Hi %s :), you have successfully registered! Share your link to earn points: %s/signup?ref=%s", os.Getenv("FRONTEND_URL"), user.Name, user.ReferralCode),
 	)
 
 	return &user, nil

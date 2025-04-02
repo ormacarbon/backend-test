@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jpeccia/go-backend-test/internal/dto"
@@ -38,6 +39,6 @@ func (u *UserHandler) RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message":       "User registered successfully",
 		"referral_code": user.ReferralCode,
-		"share_link":    fmt.Sprintf("https://test.com/signup?ref=%s", user.ReferralCode),
+		"share_link": fmt.Sprintf("%s/signup?ref=%s", os.Getenv("FRONTEND_URL"), user.ReferralCode),
 	})
 }
