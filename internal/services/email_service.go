@@ -29,9 +29,17 @@ func NewEmailService() EmailService {
 func (e *emailService) SendEmail(to string, subject string, body string) error {
 	auth := smtp.PlainAuth("", e.sender, e.password, e.smtpHost)
 
-	msg := []byte(fmt.Sprintf("Subject: %s\n\n%s", subject, body))
+	// Adicionando cabeçalhos obrigatórios para evitar problemas de entrega
+	msg := []byte(fmt.Sprintf(
+		"From: %s\r\nTo: %s\r\nSubject: %s\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s",
+		e.sender, to, subject, body,
+	))
 
 	err := smtp.SendMail(e.smtpHost+":"+e.smtpPort, auth, e.sender, []string{to}, msg)
-	return err
-}
+	if err != nil {
+		fmt.Printf("Error to send mail: %v", err)
+		return err
+	}
 
+	return nil
+}
