@@ -1,10 +1,8 @@
 package main
 
 import (
-	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/jpeccia/go-backend-test/config"
 	"github.com/jpeccia/go-backend-test/internal/database/migrations"
 	"github.com/jpeccia/go-backend-test/internal/handlers"
@@ -14,10 +12,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	config.LoadEnv()
 	config.ConnectDatabase()
 	migrations.Migrate()
 	
