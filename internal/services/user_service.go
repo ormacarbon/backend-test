@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/jpeccia/go-backend-test/internal/dto"
 	"github.com/jpeccia/go-backend-test/internal/models"
@@ -30,11 +32,19 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 		Points:       1,
 	}
 
+	emailService := NewEmailService()
+
 	if dto.ReferredBy != "" {
 		referredUser, err := u.userRepo.FindUserByReferralCode(dto.ReferredBy)
 		if err == nil {
 			referredUser.Points++
 			u.userRepo.CreateUser(referredUser)
+
+			emailService.SendEmail(
+				referredUser.Email,
+				"Congratulations! You earned an extra point!",
+				fmt.Sprintf("A new person signed up using your referral link! You now have %d points.", referredUser.Points),
+			)
 		}
 	}
 
@@ -42,6 +52,12 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 	if err != nil {
 		return nil, err
 	}
+
+	emailService.SendEmail(
+		user.Email,
+		"Welcome to the competition!",
+		fmt.Sprintf("Hi %s :), you have successfully registered! Share your link to earn points: https://test.com/signup?ref=%s", user.Name, user.ReferralCode),
+	)
 
 	return &user, nil
 }
