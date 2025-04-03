@@ -1,8 +1,9 @@
 package object_values
 
 import (
-	"errors"
 	"regexp"
+
+	"github.com/cassiusbessa/backend-test/internal/domain/shared"
 )
 
 type Email struct {
@@ -10,13 +11,12 @@ type Email struct {
 }
 
 var (
-	emailRegex      = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-	errInvalidEmail = errors.New("invalid email format")
+	emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 )
 
 func NewEmail(email string) (Email, error) {
 	if !emailRegex.MatchString(email) {
-		return Email{}, errInvalidEmail
+		return Email{}, shared.ErrValidation
 	}
 	return Email{value: email}, nil
 }
