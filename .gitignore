@@ -1,0 +1,11 @@
+.env
+venv
+.env.*
+*.log
+vendor/
+tmp/
+.DS_Store
+
+# Node
+node_modules
+package-lock.json
