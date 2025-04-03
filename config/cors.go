@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -9,6 +10,8 @@ import (
 
 func CORSMiddleware() gin.HandlerFunc {
 	frontendURL := os.Getenv("FRONTEND_URL")
+
+	log.Println("CORS AllowOrigins:", frontendURL)
 
 	config := cors.Config{
 		AllowOrigins:     []string{frontendURL},

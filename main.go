@@ -16,6 +16,7 @@ func main() {
 	migrations.Migrate()
 
 	r := gin.Default()
+	r.Use(config.CORSMiddleware())
 
 	userRepo := repositories.NewUserRepository(config.DB)
 
