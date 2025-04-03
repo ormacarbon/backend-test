@@ -1,0 +1,91 @@
+type: collection.insomnia.rest/5.0
+name: BACK-END-TEST-COMPETITION
+meta:
+  id: wrk_b13d67c651604252b1d7f224c975c901
+  created: 1743630557310
+  modified: 1743630557310
+collection:
+  - url: http://localhost:8080/api/signup
+    name: Cadastrar Usuário
+    meta:
+      id: req_5acf0c81419d4b12ae35bd5a1c7fbcfb
+      created: 1743630565594
+      modified: 1743631623100
+      isPrivate: false
+      sortKey: -1743630565594
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"name": "name",
+            "email": "test@email.com",
+        	  "phone_number": "12342256789",
+        		"referred_by": ""
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.0.1
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/api/end-competition
+    name: Finalizar Competição
+    meta:
+      id: req_01fbead0b8034164a6bbcbb56118b836
+      created: 1743630612973
+      modified: 1743631681617
+      isPrivate: false
+      sortKey: -1743630612973
+    method: POST
+    headers:
+      - name: User-Agent
+        value: insomnia/11.0.1
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/api/winners
+    name: Listar os vencedores da competição
+    meta:
+      id: req_8c0627869b614988aa79b4d007fe32e3
+      created: 1743630630346
+      modified: 1743631785681
+      isPrivate: false
+      sortKey: -1743630630346
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.0.1
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_130abd7a0ddc52cf3e136adf08dbcf2dbdca2d00
+    created: 1743630557314
+    modified: 1743630557314
+environments:
+  name: Base Environment
+  meta:
+    id: env_130abd7a0ddc52cf3e136adf08dbcf2dbdca2d00
+    created: 1743630557312
+    modified: 1743630557312
+    isPrivate: false
