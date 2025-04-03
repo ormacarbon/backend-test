@@ -3,9 +3,11 @@ package entities
 import (
 	object_values "github.com/cassiusbessa/backend-test/internal/domain/object-values"
 	"github.com/cassiusbessa/backend-test/internal/domain/shared"
+	"github.com/google/uuid"
 )
 
 type User struct {
+	id       uuid.UUID
 	name     string
 	email    object_values.Email
 	phone    object_values.PhoneNumber
@@ -16,7 +18,17 @@ func NewUser(name string, email object_values.Email, hashed_pass object_values.P
 	if name == "" {
 		return User{}, shared.ErrValidation
 	}
-	return User{name: name, password: hashed_pass, email: email, phone: phone}, nil
+	return User{
+		id:       uuid.New(),
+		name:     name,
+		email:    email,
+		phone:    phone,
+		password: hashed_pass,
+	}, nil
+}
+
+func (u User) ID() uuid.UUID {
+	return u.id
 }
 
 func (u User) Name() string {
