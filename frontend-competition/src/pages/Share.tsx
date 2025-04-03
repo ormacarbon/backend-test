@@ -1,12 +1,12 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 export default function Share() {
   const [copied, setCopied] = useState(false);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  // Pega o link correto da query string
   const shareLink = searchParams.get("link") || "";
 
   const copyToClipboard = async () => {
@@ -18,9 +18,9 @@ export default function Share() {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg text-center">
-      <h2 className="text-xl font-semibold mb-4">Convide Amigos!</h2>
-      <p className="text-gray-600 mb-4">Compartilhe este link e ganhe pontos extras:</p>
-      
+      <h2 className="text-xl font-semibold mb-4">Invite Friends!</h2>
+      <p className="text-gray-600 mb-4">Share this link and earn extra points:</p>
+
       <input
         type="text"
         value={shareLink}
@@ -29,7 +29,11 @@ export default function Share() {
       />
 
       <Button onClick={copyToClipboard} className="w-full">
-        {copied ? "Copiado!" : "Copiar Link"}
+        {copied ? "Copied!" : "Copy Link"}
+      </Button>
+
+      <Button onClick={() => navigate("/leaderboard")} className="w-full mt-4">
+        View Leaderboard
       </Button>
     </div>
   );
