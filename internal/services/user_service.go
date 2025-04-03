@@ -50,11 +50,16 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 
 		user.ReferredBy = referredUser.Email
 
-		emailService.SendEmail(
-			referredUser.Email,
-			"Congratulations! You earned an extra point!",
-			fmt.Sprintf("A new person signed up using your referral link! You now have %d points.", referredUser.Points),
-		)
+		go func() {
+			err := emailService.SendEmail(
+				referredUser.Email,
+				"Congratulations! You earned an extra point!",
+				fmt.Sprintf("A new person signed up using your referral link! You now have %d points.", referredUser.Points),
+			)
+			if err != nil {
+				fmt.Println("Erro ao enviar e-mail para o referenciador:", err)
+			}
+		}()
 	}
 
 	err := u.userRepo.CreateUser(&user)
@@ -62,11 +67,17 @@ func (u *userService) RegisterUser(dto dto.RegisterUserDTO) (*models.User, error
 		return nil, err
 	}
 
-	emailService.SendEmail(
-		user.Email,
-		"Welcome to the competition!",
-		fmt.Sprintf("Hi %s :), you have successfully registered! Share your link to earn points: %s/signup?ref=%s", os.Getenv("FRONTEND_URL"), user.Name, user.ReferralCode),
-	)
+	go func() {
+		err := emailService.SendEmail(
+			user.Email,
+			"Welcome to the competition!",
+			fmt.Sprintf("Hi %s :), you have successfully registered! Share your link to earn points: %s/signup?ref=%s",
+				user.Name, os.Getenv("FRONTEND_URL"), user.ReferralCode),
+		)
+		if err != nil {
+			fmt.Println("Erro ao enviar e-mail de boas-vindas:", err)
+		}
+	}()
 
 	return &user, nil
 }
