@@ -1,40 +1,19 @@
-version: '3'
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    environment:
-      - DB_HOST=db
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-password}
-      - DB_NAME=${DB_NAME:-orma}
-      - DB_PORT=5432
-    volumes:
-      - .:/app
-    networks:
-      - orma-network
+version: '3.8'
 
-  db:
+services:
+  postgres:
     image: postgres:latest
+    build: .
+    container_name: vbio-postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
-      - POSTGRES_DB=${DB_NAME:-orma}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - orma-network
+      - ./server/schema/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
 volumes:
   postgres_data:
-
-networks:
-  orma-network:
-    driver: bridge
