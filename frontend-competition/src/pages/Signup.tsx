@@ -1,18 +1,25 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom"; // Importa useNavigate
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/api/api";
 
 export default function Signup() {
+  const navigate = useNavigate(); // Hook para redirecionamento
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone_number: "",
   });
 
   const [searchParams] = useSearchParams();
-  const referralCode = searchParams.get("ref") || "";
+  const [referralCode, setReferralCode] = useState("");
+
+  useEffect(() => {
+    const ref = searchParams.get("ref") || "";
+    console.log("Código de indicação atualizado:", ref);
+    setReferralCode(ref);
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,14 +27,18 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
+    const data = {
+      ...formData,
+      referred_By: referralCode,
+    };
+  
+  
     try {
-      const response = await api.post("/signup", {
-        ...formData,
-        referredBy: referralCode,
-      });
-
-      alert(`Inscrição feita! Seu link de compartilhamento: ${response.data.share_link}`);
+      const response = await api.post("/api/signup", data);
+      const shareLink = response.data.share_link;
+      alert(`Inscrição feita! Seu link de compartilhamento: ${shareLink}`);
+      navigate(`/share?link=${encodeURIComponent(shareLink)}`);
     } catch (error) {
       console.error("Erro:", error);
       alert("Erro ao se inscrever.");
@@ -40,7 +51,7 @@ export default function Signup() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input name="name" placeholder="Nome" onChange={handleChange} required />
         <Input name="email" type="email" placeholder="E-mail" onChange={handleChange} required />
-        <Input name="phone" placeholder="Telefone" onChange={handleChange} required />
+        <Input name="phone_number" placeholder="Telefone" onChange={handleChange} required />
         <Button type="submit" className="w-full">Participar</Button>
       </form>
     </div>
