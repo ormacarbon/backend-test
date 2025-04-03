@@ -23,7 +23,8 @@ func TestNewUser(t *testing.T) {
 		email, _ := object_values.NewEmail(tt.email)
 		phone, _ := object_values.NewPhoneNumber(tt.phone)
 
-		_, err := entities.NewUser(tt.name, email, phone)
+		password, _ := object_values.NewPassword("defaultPassword123")
+		_, err := entities.NewUser(tt.name, email, password, phone)
 		if (err != nil) != tt.expectError {
 			t.Errorf("NewUser(%s, %s, %s) expected error: %v, got: %v", tt.name, tt.email, tt.phone, tt.expectError, err)
 		}
