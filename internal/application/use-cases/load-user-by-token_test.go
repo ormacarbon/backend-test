@@ -3,6 +3,7 @@ package usecases_test
 import (
 	"testing"
 
+	input_ports "github.com/cassiusbessa/backend-test/internal/application/ports/input"
 	usecases "github.com/cassiusbessa/backend-test/internal/application/use-cases"
 	"github.com/cassiusbessa/backend-test/internal/application/use-cases/mocks"
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
@@ -27,7 +28,7 @@ func validPassword() object_values.Password {
 	return password
 }
 
-func setupLoadUserByTokenTest() (*mocks.MockUserRepository, *mocks.MockTokenService, *usecases.LoadUserByTokenUseCase) {
+func setupLoadUserByTokenTest() (*mocks.MockUserRepository, *mocks.MockTokenService, input_ports.LoadUserByTokenUseCase) {
 	userRepo := mocks.NewMockUserRepository()
 	tokenService := mocks.NewMockTokenService()
 	return userRepo, tokenService, usecases.NewLoadUserByTokenUseCase(userRepo, tokenService)
@@ -48,9 +49,9 @@ func TestLoadUserByTokenUseCase_Execute(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
-		assert.Equal(t, expectedUser.Name(), user.Name())
-		assert.Equal(t, expectedUser.Email().Value(), user.Email().Value())
-		assert.Equal(t, expectedUser.Phone().Value(), user.Phone().Value())
+		assert.Equal(t, expectedUser.Name(), user.Name)
+		assert.Equal(t, expectedUser.Email().Value(), user.Email)
+		assert.Equal(t, expectedUser.Phone().Value(), user.Phone)
 
 		tokenService.AssertExpectations(t)
 		userRepo.AssertExpectations(t)

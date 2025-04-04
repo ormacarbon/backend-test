@@ -1,8 +1,9 @@
 package usecases
 
 import (
+	"github.com/cassiusbessa/backend-test/internal/application/dto"
+	input_ports "github.com/cassiusbessa/backend-test/internal/application/ports/input"
 	output_ports "github.com/cassiusbessa/backend-test/internal/application/ports/output"
-	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 )
 
 type LoadUserByTokenUseCase struct {
@@ -13,14 +14,14 @@ type LoadUserByTokenUseCase struct {
 func NewLoadUserByTokenUseCase(
 	userRepo output_ports.UserRepository,
 	tokenService output_ports.TokenService,
-) *LoadUserByTokenUseCase {
-	return &LoadUserByTokenUseCase{
+) input_ports.LoadUserByTokenUseCase {
+	return LoadUserByTokenUseCase{
 		userRepo:     userRepo,
 		tokenService: tokenService,
 	}
 }
 
-func (uc *LoadUserByTokenUseCase) Execute(token string) (*entities.User, error) {
+func (uc LoadUserByTokenUseCase) Execute(token string) (*dto.LoadedUserOutput, error) {
 	userID, err := uc.tokenService.ValidateToken(token)
 	if err != nil {
 		return nil, err
@@ -31,5 +32,12 @@ func (uc *LoadUserByTokenUseCase) Execute(token string) (*entities.User, error) 
 		return nil, err
 	}
 
-	return user, nil
+	if user == nil {
+		return nil, nil
+	}
+	return &dto.LoadedUserOutput{
+		ID:    user.ID().String(),
+		Name:  user.Name(),
+		Email: user.Email().Value(),
+	}, nil
 }
