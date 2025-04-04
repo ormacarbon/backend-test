@@ -6,6 +6,7 @@ import (
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 	object_values "github.com/cassiusbessa/backend-test/internal/domain/object-values"
 	"github.com/cassiusbessa/backend-test/internal/domain/shared"
+	"github.com/google/uuid"
 )
 
 type CreateUserUseCase struct {
@@ -40,7 +41,25 @@ func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserO
 		return dto.CreateUserOutput{}, shared.ErrConflictError
 	}
 
-	user, err := entities.NewUser(input.Name, emailObj, hashedPass, phoneObj, nil)
+	var invitedByID *uuid.UUID
+
+	if input.InviteCode != nil {
+		inviter, err := uc.userRepo.FindByInviteCode(*input.InviteCode)
+		if err != nil {
+			return dto.CreateUserOutput{}, shared.ErrInternal
+		}
+		if inviter != nil {
+			inviter.AddPoint()
+			err = uc.userRepo.Save(*inviter)
+			if err != nil {
+				return dto.CreateUserOutput{}, shared.ErrInternal
+			}
+			id := inviter.ID()
+			invitedByID = &id
+		}
+	}
+
+	user, err := entities.NewUser(input.Name, emailObj, hashedPass, phoneObj, invitedByID)
 	if err != nil {
 		return dto.CreateUserOutput{}, err
 	}

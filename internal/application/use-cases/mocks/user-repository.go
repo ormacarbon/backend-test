@@ -33,6 +33,14 @@ func (m *MockUserRepository) FindByID(id string) (*entities.User, error) {
 	return nil, args.Error(1)
 }
 
+func (m *MockUserRepository) FindByInviteCode(inviteCode string) (*entities.User, error) {
+	args := m.Called(inviteCode)
+	if user := args.Get(0); user != nil {
+		return user.(*entities.User), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func NewMockUserRepository() *MockUserRepository {
 	return new(MockUserRepository)
 }

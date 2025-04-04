@@ -16,7 +16,7 @@ func NewUserGormRepository(db *gorm.DB) output_ports.UserRepository {
 
 func (r *UserGormRepository) Save(user entities.User) error {
 	model := UserToModel(user)
-	return r.db.Create(&model).Error
+	return r.db.Save(&model).Error
 }
 
 func (r *UserGormRepository) FindByEmail(email string) (*entities.User, error) {
@@ -36,6 +36,20 @@ func (r *UserGormRepository) FindByEmail(email string) (*entities.User, error) {
 func (r *UserGormRepository) FindByID(id string) (*entities.User, error) {
 	var model UserModel
 	err := r.db.Where("id = ?", id).First(&model).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	user := model.ToDomain()
+	return &user, nil
+}
+
+func (r *UserGormRepository) FindByInviteCode(inviteCode string) (*entities.User, error) {
+	var model UserModel
+	err := r.db.Where("invite_code = ?", inviteCode).First(&model).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

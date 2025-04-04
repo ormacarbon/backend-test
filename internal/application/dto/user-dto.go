@@ -1,11 +1,11 @@
 package dto
 
 type CreateUserInput struct {
-	Name      string `json:"name" binding:"required"`
-	Email     string `json:"email" binding:"required,email"`
-	Password  string `json:"password" binding:"required"`
-	Phone     string `json:"phone" binding:"required"`
-	InvitedBy string `json:"invited_by"`
+	Name       string  `json:"name" binding:"required"`
+	Email      string  `json:"email" binding:"required,email"`
+	Password   string  `json:"password" binding:"required"`
+	Phone      string  `json:"phone" binding:"required"`
+	InviteCode *string `json:"invite_code" binding:"omitempty"`
 }
 
 type CreateUserOutput struct {
