@@ -6,54 +6,22 @@ import (
 
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
 	usecases "github.com/cassiusbessa/backend-test/internal/application/use-cases"
+	"github.com/cassiusbessa/backend-test/internal/application/use-cases/mocks"
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 	object_values "github.com/cassiusbessa/backend-test/internal/domain/object-values"
 	"github.com/cassiusbessa/backend-test/internal/domain/shared"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-// --- Mocks ---
-
-type MockUserRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserRepository) FindByEmail(email string) (*entities.User, error) {
-	args := m.Called(email)
-	if user := args.Get(0); user != nil {
-		return user.(*entities.User), args.Error(1)
-	}
-	return nil, args.Error(1)
-}
-
-func (m *MockUserRepository) Save(user entities.User) error {
-	args := m.Called(user)
-	if err := args.Error(0); err != nil {
-		return err
-	}
-	return nil
-}
-
-type MockTokenService struct {
-	mock.Mock
-}
-
-func (m *MockTokenService) GenerateToken(userID string) (string, error) {
-	args := m.Called(userID)
-	return args.String(0), args.Error(1)
-}
-
-func (m *MockTokenService) ValidateToken(token string) (string, error) {
-	args := m.Called(token)
-	return args.String(0), args.Error(1)
+func setupTest() (*mocks.MockUserRepository, *mocks.MockTokenService, *usecases.LoginUserUseCase) {
+	mockRepo := mocks.NewMockUserRepository()
+	mockTokenService := mocks.NewMockTokenService()
+	useCase := usecases.NewLoginUserUseCase(mockRepo, mockTokenService)
+	return mockRepo, mockTokenService, useCase
 }
 
 func TestLoginUserUseCase_Execute(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	mockTokenService := new(MockTokenService)
-
-	useCase := usecases.NewLoginUserUseCase(mockRepo, mockTokenService)
+	mockRepo, mockTokenService, useCase := setupTest()
 
 	t.Run("success", func(t *testing.T) {
 

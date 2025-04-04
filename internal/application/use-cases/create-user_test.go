@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
+	"github.com/cassiusbessa/backend-test/internal/application/use-cases/mocks"
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 	object_values "github.com/cassiusbessa/backend-test/internal/domain/object-values"
 	"github.com/cassiusbessa/backend-test/internal/domain/shared"
@@ -11,142 +12,119 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockUserRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserRepository) Save(user entities.User) error {
-	args := m.Called(user)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindByEmail(email string) (*entities.User, error) {
-	args := m.Called(email)
-	user, _ := args.Get(0).(*entities.User)
-	return user, args.Error(1)
-}
-
-func (m *MockUserRepository) SetupDefaultBehavior() {
-	m.On("FindByEmail", mock.Anything).Return(nil, nil)
-	m.On("Save", mock.Anything).Return(nil)
-}
-
-func setupTest() (*MockUserRepository, *CreateUserUseCase) {
-	mockRepo := new(MockUserRepository)
-	mockRepo.SetupDefaultBehavior()
+func setupTest() (*mocks.MockUserRepository, *CreateUserUseCase) {
+	mockRepo := mocks.NewMockUserRepository()
 	useCase := NewCreateUserUseCase(mockRepo)
 	return mockRepo, useCase
 }
 
-func TestCreateUserUseCase_Execute_Success(t *testing.T) {
-	mockRepo, useCase := setupTest()
+func TestCreateUserUseCase_Execute(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mockRepo, useCase := setupTest()
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "StrongP@ssw0rd",
-		Phone:    "+5511987654321",
-	}
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "john@example.com",
+			Password: "StrongP@ssw0rd",
+			Phone:    "+5511987654321",
+		}
 
-	output, err := useCase.Execute(input)
+		mockRepo.On("FindByEmail", input.Email).Return(nil, nil)
+		mockRepo.On("Save", mock.Anything).Return(nil)
 
-	assert.NoError(t, err)
-	assert.NotEmpty(t, output.UserID)
-	mockRepo.AssertExpectations(t)
-}
+		output, err := useCase.Execute(input)
 
-func TestCreateUserUseCase_Execute_InvalidEmail(t *testing.T) {
-	_, useCase := setupTest()
+		assert.NoError(t, err)
+		assert.NotEmpty(t, output.UserID)
+		mockRepo.AssertExpectations(t)
+	})
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "invalid-email",
-		Password: "StrongP@ssw0rd",
-		Phone:    "+5511987654321",
-	}
+	t.Run("invalid email", func(t *testing.T) {
+		_, useCase := setupTest()
 
-	_, err := useCase.Execute(input)
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "invalid-email",
+			Password: "StrongP@ssw0rd",
+			Phone:    "+5511987654321",
+		}
 
-	assert.ErrorIs(t, err, shared.ErrValidation)
-}
+		_, err := useCase.Execute(input)
 
-func TestCreateUserUseCase_Execute_InvalidPhone(t *testing.T) {
-	_, useCase := setupTest()
+		assert.ErrorIs(t, err, shared.ErrValidation)
+	})
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "StrongP@ssw0rd",
-		Phone:    "1234",
-	}
+	t.Run("invalid phone", func(t *testing.T) {
+		_, useCase := setupTest()
 
-	_, err := useCase.Execute(input)
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "john@example.com",
+			Password: "StrongP@ssw0rd",
+			Phone:    "1234",
+		}
 
-	assert.ErrorIs(t, err, shared.ErrValidation)
-}
+		_, err := useCase.Execute(input)
 
-func TestCreateUserUseCase_Execute_InvalidPassword(t *testing.T) {
-	_, useCase := setupTest()
+		assert.ErrorIs(t, err, shared.ErrValidation)
+	})
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "123",
-		Phone:    "+5511987654321",
-	}
+	t.Run("invalid password", func(t *testing.T) {
+		_, useCase := setupTest()
 
-	_, err := useCase.Execute(input)
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "john@example.com",
+			Password: "123",
+			Phone:    "+5511987654321",
+		}
 
-	assert.ErrorIs(t, err, shared.ErrValidation)
-}
+		_, err := useCase.Execute(input)
 
-func TestCreateUserUseCase_Execute_SaveError(t *testing.T) {
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "StrongP@ssw0rd",
-		Phone:    "+5511987654321",
-	}
-	mockRepo, useCase := setupTest()
+		assert.ErrorIs(t, err, shared.ErrValidation)
+	})
 
-	mockRepo.ExpectedCalls = nil
-	mockRepo.On("Save", mock.Anything).Return(shared.ErrInternal)
-	mockRepo.On("FindByEmail", input.Email).Return(nil, nil)
+	t.Run("user already exists", func(t *testing.T) {
+		mockRepo, useCase := setupTest()
 
-	_, err := useCase.Execute(input)
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "john@example.com",
+			Password: "StrongP@ssw0rd",
+			Phone:    "+5511987654321",
+		}
 
-	mockRepo.AssertCalled(t, "Save", mock.Anything)
-	assert.EqualError(t, err, shared.ErrInternal.Error())
-	mockRepo.AssertExpectations(t)
-}
+		email, _ := object_values.NewEmail(input.Email)
+		phone, _ := object_values.NewPhoneNumber(input.Phone)
+		password, _ := object_values.NewPassword(input.Password)
 
-func TestCreateUserUseCase_Execute_UserAlreadyExists(t *testing.T) {
-	mockRepo, useCase := setupTest()
+		existingUser, _ := entities.NewUser("John Doe", email, password, phone)
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "StrongP@ssw0rd",
-		Phone:    "+5511987654321",
-	}
+		mockRepo.On("FindByEmail", input.Email).Return(&existingUser, nil)
 
-	email, _ := object_values.NewEmail(input.Email)
-	phone, _ := object_values.NewPhoneNumber(input.Phone)
-	password, _ := object_values.NewPassword(input.Password)
+		_, err := useCase.Execute(input)
 
-	existingUser, _ := entities.NewUser(
-		"John Doe",
-		email,
-		password,
-		phone,
-	)
+		assert.ErrorIs(t, err, shared.ErrConflictError)
+		mockRepo.AssertNotCalled(t, "Save")
+		mockRepo.AssertExpectations(t)
+	})
 
-	mockRepo.ExpectedCalls = nil
-	mockRepo.On("FindByEmail", input.Email).Return(&existingUser, nil)
+	t.Run("repository save error", func(t *testing.T) {
+		mockRepo, useCase := setupTest()
 
-	_, err := useCase.Execute(input)
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "john@example.com",
+			Password: "StrongP@ssw0rd",
+			Phone:    "+5511987654321",
+		}
 
-	assert.ErrorIs(t, err, shared.ErrConflictError)
-	mockRepo.AssertNotCalled(t, "Save")
-	mockRepo.AssertExpectations(t)
+		mockRepo.On("FindByEmail", input.Email).Return(nil, nil)
+		mockRepo.On("Save", mock.Anything).Return(shared.ErrInternal)
+
+		_, err := useCase.Execute(input)
+
+		assert.EqualError(t, err, shared.ErrInternal.Error())
+		mockRepo.AssertExpectations(t)
+	})
 }
