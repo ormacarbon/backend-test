@@ -14,7 +14,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// Mock do Use Case
 type MockCreateUserUseCase struct {
 	mock.Mock
 }
