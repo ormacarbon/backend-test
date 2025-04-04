@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  # app:
+  #   build: .
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #   env_file:
+  #     - .env
+  #   restart: unless-stopped
+
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: vbio
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
