@@ -32,3 +32,7 @@ func UserToModel(user entities.User) UserModel {
 		Password: user.Password().Hash(),
 	}
 }
+
+func (UserModel) TableName() string {
+	return "users"
+}
