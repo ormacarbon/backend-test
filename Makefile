@@ -1,8 +1,9 @@
 install:
-	cd docker && docker compose up -d
+	docker compose up -d
 	cd client && npm install
 
 runapi:
+	docker compose up -d
 	cd server && go run cmd/main.go
 
 runclient:
