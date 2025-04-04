@@ -26,10 +26,10 @@ func (m *MockCreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUs
 
 func setupTestHandler() (*MockCreateUserUseCase, *gin.Engine) {
 	mockUseCase := new(MockCreateUserUseCase)
-	handler := NewUserHandler(mockUseCase)
+	handler := NewCreateUserHandler(mockUseCase)
 
 	router := gin.Default()
-	router.POST("/users", handler.CreateUser)
+	router.POST("/users", handler.Execute)
 
 	return mockUseCase, router
 }

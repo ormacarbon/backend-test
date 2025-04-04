@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/cassiusbessa/backend-test/internal/infra/db"
+	"github.com/cassiusbessa/backend-test/internal/interfaces/http/factory"
+	"github.com/cassiusbessa/backend-test/internal/interfaces/http/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -21,13 +23,20 @@ func main() {
 		port = "8080"
 	}
 
-	router := gin.Default()
-	router.GET("/health", func(c *gin.Context) {
+	r := gin.Default()
+	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
+	api := r.Group("/api")
+	userHandlerFactory := factory.NewUserHandlerFactory()
+	createUserHandler := userHandlerFactory.BuildCreateUserHandler()
+
+	userRoutes := routes.NewUserRouterBuilder(api.Group("/users"), createUserHandler)
+	userRoutes.Build()
+
 	log.Printf("Server running on port %s 🚀", port)
-	if err := router.Run(":" + port); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}
 }

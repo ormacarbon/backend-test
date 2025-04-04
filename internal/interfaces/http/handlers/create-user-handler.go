@@ -9,15 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
+type CreateUserHandler struct {
 	createUserUseCase input_ports.CreateUserUseCase
 }
 
-func NewUserHandler(createUserUseCase input_ports.CreateUserUseCase) *UserHandler {
-	return &UserHandler{createUserUseCase: createUserUseCase}
+func NewCreateUserHandler(createUserUseCase input_ports.CreateUserUseCase) *CreateUserHandler {
+	return &CreateUserHandler{createUserUseCase: createUserUseCase}
 }
 
-func (h *UserHandler) CreateUser(ctx *gin.Context) {
+func (h *CreateUserHandler) Execute(ctx *gin.Context) {
 	var input dto.CreateUserInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
