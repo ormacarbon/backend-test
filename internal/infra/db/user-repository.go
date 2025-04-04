@@ -32,3 +32,17 @@ func (r *UserGormRepository) FindByEmail(email string) (*entities.User, error) {
 	user := model.ToDomain()
 	return &user, nil
 }
+
+func (r *UserGormRepository) FindByID(id string) (*entities.User, error) {
+	var model UserModel
+	err := r.db.Where("id = ?", id).First(&model).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	user := model.ToDomain()
+	return &user, nil
+}

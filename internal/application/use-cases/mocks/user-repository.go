@@ -25,6 +25,14 @@ func (m *MockUserRepository) Save(user entities.User) error {
 	return nil
 }
 
+func (m *MockUserRepository) FindByID(id string) (*entities.User, error) {
+	args := m.Called(id)
+	if user := args.Get(0); user != nil {
+		return user.(*entities.User), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func NewMockUserRepository() *MockUserRepository {
 	return new(MockUserRepository)
 }
