@@ -19,7 +19,7 @@ func (model UserModel) ToDomain() entities.User {
 	phone, _ := object_values.NewPhoneNumber(model.Phone)
 	hashedPass := object_values.NewPasswordFromHash(model.Password)
 
-	user, _ := entities.NewUser(model.Name, email, hashedPass, phone)
+	user := entities.LoadUser(model.ID, model.Name, email, hashedPass, phone)
 	return user
 }
 

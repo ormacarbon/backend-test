@@ -27,6 +27,16 @@ func NewUser(name string, email object_values.Email, hashed_pass object_values.P
 	}, nil
 }
 
+func LoadUser(id uuid.UUID, name string, email object_values.Email, hashed_pass object_values.Password, phone object_values.PhoneNumber) User {
+	return User{
+		id:       id,
+		name:     name,
+		email:    email,
+		phone:    phone,
+		password: hashed_pass,
+	}
+}
+
 func (u User) ID() uuid.UUID {
 	return u.id
 }

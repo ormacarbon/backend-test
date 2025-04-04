@@ -39,5 +39,6 @@ func (uc LoadUserByTokenUseCase) Execute(token string) (*dto.LoadedUserOutput, e
 		ID:    user.ID().String(),
 		Name:  user.Name(),
 		Email: user.Email().Value(),
+		Phone: user.Phone().Value(),
 	}, nil
 }
