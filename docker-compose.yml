@@ -1,0 +1,21 @@
+services:
+  api:
+    container_name: api
+    build: ./gss-carbon-service
+    ports:
+      - "3000:3000"
+    environment:
+      - SERVER_PORT=3000
+      - DATABASE_URL=postgres://admin:admin@database:5432/postgres?sslmode=disable
+    depends_on:
+      - database
+
+  database:
+    container_name: database
+    image: postgres:17.2-alpine3.21
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
