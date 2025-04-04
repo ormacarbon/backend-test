@@ -2,17 +2,17 @@ package usecases
 
 import (
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
-	"github.com/cassiusbessa/backend-test/internal/application/repositories"
+	output_ports "github.com/cassiusbessa/backend-test/internal/application/ports/output"
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 	object_values "github.com/cassiusbessa/backend-test/internal/domain/object-values"
 	"github.com/cassiusbessa/backend-test/internal/domain/shared"
 )
 
 type CreateUserUseCase struct {
-	userRepo repositories.UserRepository
+	userRepo output_ports.UserRepository
 }
 
-func NewCreateUserUseCase(repo repositories.UserRepository) *CreateUserUseCase {
+func NewCreateUserUseCase(repo output_ports.UserRepository) *CreateUserUseCase {
 	return &CreateUserUseCase{userRepo: repo}
 }
 
