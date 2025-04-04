@@ -30,6 +30,7 @@ func main() {
 	api := r.Group("/api")
 	routes.WithCreateUser(api)
 	routes.WithLogin(api)
+	routes.WithLoadUserByToken(api)
 
 	log.Printf("Server running on port %s 🚀", port)
 	if err := r.Run(":" + port); err != nil {

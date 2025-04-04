@@ -14,3 +14,8 @@ func WithLogin(g *gin.RouterGroup) {
 	handler := factory.BuildLoginHandler()
 	g.POST("/login", handler.Execute)
 }
+
+func WithLoadUserByToken(g *gin.RouterGroup) {
+	handler := factory.BuildLoadUserByTokenHandler()
+	g.GET("/me", handler.Execute)
+}
