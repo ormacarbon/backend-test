@@ -34,12 +34,16 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.Logger) {
 	userService := service.NewUserService(userRepo, emailSvc, logger)
 
 	// --- Handlers ---
+	healthHandler := handler.NewHealthHandler(db, logger)
 	userHandler := handler.NewUserHandler(userService, logger)
 	leaderboardHandler := handler.NewLeaderboardHandler(userService, logger)
 	competitionHandler := handler.NewCompetitionHandler(userService, logger)
 
-	// Define os endpoints
 	api := app.Group("/api")
+
+	// Health Check endpoints
+	api.Get("/health/ping", healthHandler.Ping)
+	api.Get("/health/check", healthHandler.Checker)
 
 	// User endpoints
 	api.Post("/register", userHandler.RegisterUser)
