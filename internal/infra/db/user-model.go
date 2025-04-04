@@ -17,7 +17,7 @@ type UserModel struct {
 func (model UserModel) ToDomain() entities.User {
 	email, _ := object_values.NewEmail(model.Email)
 	phone, _ := object_values.NewPhoneNumber(model.Phone)
-	hashedPass, _ := object_values.NewPassword(model.Password)
+	hashedPass := object_values.NewPasswordFromHash(model.Password)
 
 	user, _ := entities.NewUser(model.Name, email, hashedPass, phone)
 	return user
