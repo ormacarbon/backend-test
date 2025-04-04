@@ -10,3 +10,12 @@ type CreateUserInput struct {
 type CreateUserOutput struct {
 	UserID string `json:"user_id"`
 }
+
+type LoginInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginOutput struct {
+	Token string `json:"token"`
+}
