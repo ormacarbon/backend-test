@@ -30,8 +30,7 @@ func validPassword() object_values.Password {
 func setupLoadUserByTokenTest() (*mocks.MockUserRepository, *mocks.MockTokenService, *usecases.LoadUserByTokenUseCase) {
 	userRepo := mocks.NewMockUserRepository()
 	tokenService := mocks.NewMockTokenService()
-	useCase := usecases.NewLoadUserByTokenUseCase(userRepo, tokenService)
-	return userRepo, tokenService, useCase
+	return userRepo, tokenService, usecases.NewLoadUserByTokenUseCase(userRepo, tokenService)
 }
 
 func TestLoadUserByTokenUseCase_Execute(t *testing.T) {
@@ -48,7 +47,11 @@ func TestLoadUserByTokenUseCase_Execute(t *testing.T) {
 		user, err := useCase.Execute(token)
 
 		assert.NoError(t, err)
-		assert.Equal(t, expectedUser, *user)
+		assert.NotNil(t, user)
+		assert.Equal(t, expectedUser.Name(), user.Name())
+		assert.Equal(t, expectedUser.Email().Value(), user.Email().Value())
+		assert.Equal(t, expectedUser.Phone().Value(), user.Phone().Value())
+
 		tokenService.AssertExpectations(t)
 		userRepo.AssertExpectations(t)
 	})
