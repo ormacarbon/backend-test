@@ -34,61 +34,63 @@ func setupTestHandler() (*MockCreateUserUseCase, *gin.Engine) {
 	return mockUseCase, router
 }
 
-func TestCreateUser_Success(t *testing.T) {
-	mockUseCase, router := setupTestHandler()
+func TestCreateUserHandler_Execute(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mockUseCase, router := setupTestHandler()
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "StrongP@ssw0rd",
-		Phone:    "+5511987654321",
-	}
-	output := dto.CreateUserOutput{UserID: "123"}
+		input := dto.CreateUserInput{
+			Name:     "John Doe",
+			Email:    "john@example.com",
+			Password: "StrongP@ssw0rd",
+			Phone:    "+5511987654321",
+		}
+		output := dto.CreateUserOutput{UserID: "123"}
 
-	mockUseCase.On("Execute", input).Return(output, nil)
+		mockUseCase.On("Execute", input).Return(output, nil)
 
-	body, _ := json.Marshal(input)
-	req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+		body, _ := json.Marshal(input)
+		req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
 
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusCreated, w.Code)
-	mockUseCase.AssertExpectations(t)
-}
+		assert.Equal(t, http.StatusCreated, w.Code)
+		mockUseCase.AssertExpectations(t)
+	})
 
-func TestCreateUser_InvalidRequestBody(t *testing.T) {
-	_, router := setupTestHandler()
+	t.Run("invalid request body", func(t *testing.T) {
+		_, router := setupTestHandler()
 
-	req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer([]byte("{invalid_json}")))
-	req.Header.Set("Content-Type", "application/json")
+		req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer([]byte("{invalid_json}")))
+		req.Header.Set("Content-Type", "application/json")
 
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-}
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
 
-func TestCreateUser_Conflict(t *testing.T) {
-	mockUseCase, router := setupTestHandler()
+	t.Run("conflict error", func(t *testing.T) {
+		mockUseCase, router := setupTestHandler()
 
-	input := dto.CreateUserInput{
-		Name:     "John Doe",
-		Email:    "john@example.com",
-		Password: "StrongP@ssw0rd",
-		Phone:    "+5511987654321",
-	}
+		input := dto.CreateUserInput{
+			Name:     "Jane Doe",
+			Email:    "jane@example.com",
+			Password: "StrongP@ss123",
+			Phone:    "+5511981234567",
+		}
 
-	mockUseCase.On("Execute", input).Return(dto.CreateUserOutput{}, shared.ErrConflictError)
+		mockUseCase.On("Execute", input).Return(dto.CreateUserOutput{}, shared.ErrConflictError)
 
-	body, _ := json.Marshal(input)
-	req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+		body, _ := json.Marshal(input)
+		req, _ := http.NewRequest("POST", "/users", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
 
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusConflict, w.Code)
-	mockUseCase.AssertExpectations(t)
+		assert.Equal(t, http.StatusConflict, w.Code)
+		mockUseCase.AssertExpectations(t)
+	})
 }
