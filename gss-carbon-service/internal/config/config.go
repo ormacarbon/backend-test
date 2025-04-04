@@ -1,8 +1,11 @@
 package config
 
 import (
+	"errors"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -11,13 +14,17 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
+	if err := godotenv.Load(); err != nil {
+		log.Printf("No .env file found or error loading it: %v", err)
+	}
+
 	cfg := &Config{
 		ServerPort:  getEnv("SERVER_PORT", "3000"),
 		DatabaseURL: getEnv("DATABASE_URL", ""),
 	}
 
 	if cfg.DatabaseURL == "" {
-		log.Fatal("DATABASE_URL is required")
+		return nil, errors.New("DATABASE_URL environment variable is required")
 	}
 
 	return cfg, nil
