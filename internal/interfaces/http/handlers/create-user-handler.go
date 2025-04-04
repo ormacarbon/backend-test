@@ -28,14 +28,19 @@ func (h *CreateUserHandler) Execute(ctx *gin.Context) {
 	switch err {
 	case shared.ErrNotFound:
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
 	case shared.ErrAuthorization:
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
 	case shared.ErrValidation:
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	case shared.ErrConflictError:
 		ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
 	case shared.ErrInternal:
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	default:
 	}
 
