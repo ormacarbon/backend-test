@@ -98,7 +98,7 @@ func TestCreateUserUseCase_Execute(t *testing.T) {
 		phone, _ := object_values.NewPhoneNumber(input.Phone)
 		password, _ := object_values.NewPassword(input.Password)
 
-		existingUser, _ := entities.NewUser("John Doe", email, password, phone)
+		existingUser, _ := entities.NewUser("John Doe", email, password, phone, nil)
 
 		mockRepo.On("FindByEmail", input.Email).Return(&existingUser, nil)
 

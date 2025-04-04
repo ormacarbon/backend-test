@@ -29,7 +29,7 @@ func TestLoginUserUseCase_Execute(t *testing.T) {
 		email, _ := object_values.NewEmail("test@example.com")
 		phoneNumber, _ := object_values.NewPhoneNumber("1234567890")
 
-		user, _ := entities.NewUser("teste", email, password, phoneNumber)
+		user, _ := entities.NewUser("teste", email, password, phoneNumber, nil)
 
 		input := dto.LoginInput{Email: "test@example.com", Password: "123456"}
 		expectedToken := "fake.jwt.token"
@@ -57,7 +57,7 @@ func TestLoginUserUseCase_Execute(t *testing.T) {
 		password, _ := object_values.NewPassword("correct-password")
 		phone, _ := object_values.NewPhoneNumber("1234567890")
 
-		user, _ := entities.NewUser("User", email, password, phone)
+		user, _ := entities.NewUser("User", email, password, phone, nil)
 
 		input := dto.LoginInput{Email: "user@example.com", Password: "wrong-password"}
 
@@ -72,7 +72,7 @@ func TestLoginUserUseCase_Execute(t *testing.T) {
 		password, _ := object_values.NewPassword("pass123")
 		phone, _ := object_values.NewPhoneNumber("1234567890")
 
-		user, _ := entities.NewUser("User", email, password, phone)
+		user, _ := entities.NewUser("User", email, password, phone, nil)
 
 		input := dto.LoginInput{Email: "user2@example.com", Password: "pass123"}
 

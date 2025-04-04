@@ -40,7 +40,7 @@ func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserO
 		return dto.CreateUserOutput{}, shared.ErrConflictError
 	}
 
-	user, err := entities.NewUser(input.Name, emailObj, hashedPass, phoneObj)
+	user, err := entities.NewUser(input.Name, emailObj, hashedPass, phoneObj, nil)
 	if err != nil {
 		return dto.CreateUserOutput{}, err
 	}

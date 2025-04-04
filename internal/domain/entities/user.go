@@ -7,33 +7,58 @@ import (
 )
 
 type User struct {
-	id       uuid.UUID
-	name     string
-	email    object_values.Email
-	phone    object_values.PhoneNumber
-	password object_values.Password
+	id         uuid.UUID
+	name       string
+	email      object_values.Email
+	phone      object_values.PhoneNumber
+	password   object_values.Password
+	inviteCode string
+	invitedBy  *uuid.UUID
+	points     int
 }
 
-func NewUser(name string, email object_values.Email, hashed_pass object_values.Password, phone object_values.PhoneNumber) (User, error) {
+func NewUser(
+	name string,
+	email object_values.Email,
+	hashedPass object_values.Password,
+	phone object_values.PhoneNumber,
+	invitedBy *uuid.UUID,
+) (User, error) {
 	if name == "" {
 		return User{}, shared.ErrValidation
 	}
+
 	return User{
-		id:       uuid.New(),
-		name:     name,
-		email:    email,
-		phone:    phone,
-		password: hashed_pass,
+		id:         uuid.New(),
+		name:       name,
+		email:      email,
+		phone:      phone,
+		password:   hashedPass,
+		inviteCode: uuid.NewString(),
+		invitedBy:  invitedBy,
+		points:     1,
 	}, nil
 }
 
-func LoadUser(id uuid.UUID, name string, email object_values.Email, hashed_pass object_values.Password, phone object_values.PhoneNumber) User {
+func LoadUser(
+	id uuid.UUID,
+	name string,
+	email object_values.Email,
+	hashedPass object_values.Password,
+	phone object_values.PhoneNumber,
+	inviteCode string,
+	invitedBy *uuid.UUID,
+	points int,
+) User {
 	return User{
-		id:       id,
-		name:     name,
-		email:    email,
-		phone:    phone,
-		password: hashed_pass,
+		id:         id,
+		name:       name,
+		email:      email,
+		phone:      phone,
+		password:   hashedPass,
+		inviteCode: inviteCode,
+		invitedBy:  invitedBy,
+		points:     points,
 	}
 }
 
@@ -55,4 +80,20 @@ func (u User) Password() object_values.Password {
 
 func (u User) Phone() object_values.PhoneNumber {
 	return u.phone
+}
+
+func (u User) InviteCode() string {
+	return u.inviteCode
+}
+
+func (u User) InvitedBy() *uuid.UUID {
+	return u.invitedBy
+}
+
+func (u *User) AddPoint() {
+	u.points++
+}
+
+func (u User) Points() int {
+	return u.points
 }

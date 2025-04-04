@@ -40,7 +40,7 @@ func TestLoadUserByTokenUseCase_Execute(t *testing.T) {
 
 		token := "valid-token"
 		userID := uuid.New()
-		expectedUser, _ := entities.NewUser("John Doe", validEmail(), validPassword(), validPhone())
+		expectedUser, _ := entities.NewUser("John Doe", validEmail(), validPassword(), validPhone(), nil)
 
 		tokenService.On("ValidateToken", token).Return(userID.String(), nil)
 		userRepo.On("FindByID", userID.String()).Return(&expectedUser, nil)
