@@ -22,6 +22,10 @@ func NewPassword(plainText string) (Password, error) {
 	return Password{hash: string(hashed)}, nil
 }
 
+func NewPasswordFromHash(hash string) Password {
+	return Password{hash: hash}
+}
+
 func (p Password) Hash() string {
 	return p.hash
 }

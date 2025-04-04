@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/cassiusbessa/backend-test/internal/infra/db"
-	"github.com/cassiusbessa/backend-test/internal/interfaces/http/factory"
 	"github.com/cassiusbessa/backend-test/internal/interfaces/http/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -29,11 +28,8 @@ func main() {
 	})
 
 	api := r.Group("/api")
-	userHandlerFactory := factory.NewUserHandlerFactory()
-	createUserHandler := userHandlerFactory.BuildCreateUserHandler()
-
-	userRoutes := routes.NewUserRouterBuilder(api.Group("/users"), createUserHandler)
-	userRoutes.Build()
+	routes.WithCreateUser(api)
+	routes.WithLogin(api)
 
 	log.Printf("Server running on port %s 🚀", port)
 	if err := r.Run(":" + port); err != nil {

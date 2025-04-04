@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
@@ -24,7 +23,6 @@ func (h *LoginHandler) Execute(ctx *gin.Context) {
 	var input dto.LoginInput
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
