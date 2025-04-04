@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/cassiusbessa/backend-test/internal/application/repositories"
+	output_ports "github.com/cassiusbessa/backend-test/internal/application/ports/output"
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 	"gorm.io/gorm"
 )
@@ -10,7 +10,7 @@ type UserGormRepository struct {
 	db *gorm.DB
 }
 
-func NewUserGormRepository(db *gorm.DB) repositories.UserRepository {
+func NewUserGormRepository(db *gorm.DB) output_ports.UserRepository {
 	return &UserGormRepository{db: db}
 }
 

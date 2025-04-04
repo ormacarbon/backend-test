@@ -1,4 +1,4 @@
-package repositories
+package output_ports
 
 import "github.com/cassiusbessa/backend-test/internal/domain/entities"
 
