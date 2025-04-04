@@ -7,9 +7,9 @@ class Client {
 		this.baseUrl = process.env.API_URL || 'http://localhost:8000';
 	}
 
-	private async get<T>(endpoint: string, options?: RequestInit): Promise<Response<T>> {
+	private async get<T>(end: string, options?: RequestInit): Promise<Response<T>> {
 		try {
-			const response = await fetch(`${this.baseUrl}${endpoint}`, {
+			const response = await fetch(`${this.baseUrl}${end}`, {
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -18,7 +18,7 @@ class Client {
 
 			const result = await response.json();
 
-			if (!response.ok) throw new Error(result.error || `API request failed: ${endpoint}`);
+			if (!response.ok) throw new Error(result.error || `API request failed: ${end}`);
 
 			return result;
 		} catch (error) {
@@ -33,8 +33,10 @@ class Client {
 		});
 	}
 
-	async getLeaderboard(): Promise<Response<User[]>> {
-		return this.get<User[]>('/api/leaderboard');
+	async getLeaderboard(params?: { sort?: string; page?: string; search?: string }): Promise<Response<User[]>> {
+		const query = new URLSearchParams(params).toString();
+		const end = query ? `/api/leaderboard?${query}` : '/api/leaderboard';
+		return this.get<User[]>(end);
 	}
 }
 
