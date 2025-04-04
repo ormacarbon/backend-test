@@ -8,5 +8,5 @@ type CreateUserInput struct {
 }
 
 type CreateUserOutput struct {
-	UserID string
+	UserID string `json:"user_id"`
 }
