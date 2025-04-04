@@ -1,19 +1,30 @@
 package email
 
-import "log"
+import (
+	"go.uber.org/zap"
+)
 
 type EmailService interface {
 	SendEmail(to, subject, body string) error
 }
 
-type emailService struct{}
+type emailService struct {
+	logger *zap.Logger
+}
 
-func NewEmailService() EmailService {
-	return &emailService{}
+func NewEmailService(logger *zap.Logger) EmailService {
+	return &emailService{
+		logger: logger.Named("EmailService"),
+	}
 }
 
 func (s *emailService) SendEmail(to, subject, body string) error {
-	// Exemplo: Apenas loga o envio do e-mail
-	log.Printf("Sending email to %s: subject=%s, body=%s", to, subject, body)
+	sugar := s.logger.Sugar()
+
+	sugar.Infow("Simulating email send",
+		"to", to,
+		"subject", subject,
+	)
+
 	return nil
 }
