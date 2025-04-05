@@ -18,22 +18,12 @@ func NewCreateUserUseCase(repo output_ports.UserRepository) *CreateUserUseCase {
 }
 
 func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserOutput, error) {
-	emailObj, err := object_values.NewEmail(input.Email)
+	newUser, err := uc.createUserDTOToUser(input)
 	if err != nil {
-		return dto.CreateUserOutput{}, shared.ErrValidation
+		return dto.CreateUserOutput{}, err
 	}
 
-	phoneObj, err := object_values.NewPhoneNumber(input.Phone)
-	if err != nil {
-		return dto.CreateUserOutput{}, shared.ErrValidation
-	}
-
-	hashedPass, err := object_values.NewPassword(input.Password)
-	if err != nil {
-		return dto.CreateUserOutput{}, shared.ErrValidation
-	}
-
-	existingUser, err := uc.userRepo.FindByEmail(emailObj.Value())
+	existingUser, err := uc.userRepo.FindByEmail(input.Email)
 	if err != nil {
 		return dto.CreateUserOutput{}, shared.ErrInternal
 	}
@@ -41,33 +31,71 @@ func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserO
 		return dto.CreateUserOutput{}, shared.ErrConflictError
 	}
 
-	var invitedByID *uuid.UUID
-
-	if input.InviteCode != nil {
-		inviter, err := uc.userRepo.FindByInviteCode(*input.InviteCode)
-		if err != nil {
-			return dto.CreateUserOutput{}, shared.ErrInternal
-		}
-		if inviter != nil {
-			inviter.AddPoint()
-			err = uc.userRepo.Save(*inviter)
-			if err != nil {
-				return dto.CreateUserOutput{}, shared.ErrInternal
-			}
-			id := inviter.ID()
-			invitedByID = &id
-		}
-	}
-
-	user, err := entities.NewUser(input.Name, emailObj, hashedPass, phoneObj, invitedByID)
+	err = uc.processInviteCode(input.InviteCode)
 	if err != nil {
 		return dto.CreateUserOutput{}, err
 	}
 
-	err = uc.userRepo.Save(user)
+	err = uc.userRepo.Save(*newUser)
 	if err != nil {
 		return dto.CreateUserOutput{}, shared.ErrInternal
 	}
 
-	return dto.CreateUserOutput{UserID: user.ID().String()}, nil
+	return dto.CreateUserOutput{UserID: newUser.ID().String()}, nil
+}
+
+func (uc *CreateUserUseCase) createUserDTOToUser(input dto.CreateUserInput) (*entities.User, error) {
+	email, err := object_values.NewEmail(input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	password, err := object_values.NewPassword(input.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	phone, err := object_values.NewPhoneNumber(input.Phone)
+	if err != nil {
+		return nil, err
+	}
+
+	var inviteCode *uuid.UUID
+	if input.InviteCode != nil {
+		inviteCodeUUID, err := uuid.Parse(*input.InviteCode)
+		if err != nil {
+			return nil, err
+		}
+		inviteCode = &inviteCodeUUID
+	}
+
+	user, err := entities.NewUser(input.Name, email, password, phone, inviteCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (uc *CreateUserUseCase) processInviteCode(inviteCode *string) error {
+	if inviteCode == nil {
+		return nil
+	}
+
+	inviter, err := uc.userRepo.FindByInviteCode(*inviteCode)
+	if err != nil {
+		return shared.ErrInternal
+	}
+
+	if inviter == nil {
+		return shared.ErrNotFound
+	}
+
+	inviter.AddPoint()
+	err = uc.userRepo.Save(*inviter)
+	if err != nil {
+		return shared.ErrInternal
+	}
+
+	return nil
 }
