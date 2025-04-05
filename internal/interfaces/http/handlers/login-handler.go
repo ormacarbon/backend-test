@@ -10,12 +10,12 @@ import (
 )
 
 type LoginHandler struct {
-	loginUserUseCase input_ports.LoginUseCase
+	uc input_ports.LoginUseCase
 }
 
-func NewLoginHandler(loginUserCase input_ports.LoginUseCase) *LoginHandler {
+func NewLoginHandler(uc input_ports.LoginUseCase) *LoginHandler {
 	return &LoginHandler{
-		loginUserUseCase: loginUserCase,
+		uc: uc,
 	}
 }
 
@@ -27,7 +27,7 @@ func (h *LoginHandler) Execute(ctx *gin.Context) {
 		return
 	}
 
-	output, err := h.loginUserUseCase.Execute(input)
+	output, err := h.uc.Execute(input)
 	if err != nil {
 		switch err {
 		case shared.ErrNotFound:

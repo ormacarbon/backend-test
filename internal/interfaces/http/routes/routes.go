@@ -19,3 +19,8 @@ func WithLoadUserByToken(g *gin.RouterGroup) {
 	handler := factory.BuildLoadUserByTokenHandler()
 	g.GET("/me", handler.Execute)
 }
+
+func WithUsersRanking(g *gin.RouterGroup) {
+	handler := factory.BuildLoadUsersOrderedByPointsHandler()
+	g.GET("/users/ranking", handler.Execute)
+}

@@ -62,3 +62,9 @@ func BuildLoadUserByTokenHandler() *handlers.LoadUserByTokenHandler {
 	useCase := usecases.NewLoadUserByTokenUseCase(deps.UserRepository, deps.TokenService)
 	return handlers.NewLoadUserByTokenHandler(useCase)
 }
+
+func BuildLoadUsersOrderedByPointsHandler() *handlers.LoadUsersOrderedByPointsHandler {
+	deps := getDependencies()
+	useCase := usecases.NewLoadUsersOrderedByPointsUseCase(deps.UserRepository)
+	return handlers.NewLoadUsersOrderedByPointsHandler(useCase)
+}

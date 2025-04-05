@@ -10,11 +10,11 @@ import (
 )
 
 type CreateUserHandler struct {
-	createUserUseCase input_ports.CreateUserUseCase
+	uc input_ports.CreateUserUseCase
 }
 
-func NewCreateUserHandler(createUserUseCase input_ports.CreateUserUseCase) *CreateUserHandler {
-	return &CreateUserHandler{createUserUseCase: createUserUseCase}
+func NewCreateUserHandler(uc input_ports.CreateUserUseCase) *CreateUserHandler {
+	return &CreateUserHandler{uc: uc}
 }
 
 func (h *CreateUserHandler) Execute(ctx *gin.Context) {
@@ -24,7 +24,7 @@ func (h *CreateUserHandler) Execute(ctx *gin.Context) {
 		return
 	}
 
-	output, err := h.createUserUseCase.Execute(input)
+	output, err := h.uc.Execute(input)
 	switch err {
 	case shared.ErrNotFound:
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

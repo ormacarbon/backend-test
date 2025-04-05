@@ -8,11 +8,11 @@ import (
 )
 
 type LoadUserByTokenHandler struct {
-	LoadUserByTokenUseCase input_ports.LoadUserByTokenUseCase
+	uc input_ports.LoadUserByTokenUseCase
 }
 
-func NewLoadUserByTokenHandler(loadUserByTokenUseCase input_ports.LoadUserByTokenUseCase) *LoadUserByTokenHandler {
-	return &LoadUserByTokenHandler{LoadUserByTokenUseCase: loadUserByTokenUseCase}
+func NewLoadUserByTokenHandler(uc input_ports.LoadUserByTokenUseCase) *LoadUserByTokenHandler {
+	return &LoadUserByTokenHandler{uc: uc}
 }
 
 func (h *LoadUserByTokenHandler) Execute(ctx *gin.Context) {
@@ -22,7 +22,7 @@ func (h *LoadUserByTokenHandler) Execute(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.LoadUserByTokenUseCase.Execute(token)
+	user, err := h.uc.Execute(token)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return

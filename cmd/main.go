@@ -31,6 +31,7 @@ func main() {
 	routes.WithCreateUser(api)
 	routes.WithLogin(api)
 	routes.WithLoadUserByToken(api)
+	routes.WithUsersRanking(api)
 
 	log.Printf("Server running on port %s 🚀", port)
 	if err := r.Run(":" + port); err != nil {
