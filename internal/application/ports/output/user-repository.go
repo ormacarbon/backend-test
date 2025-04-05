@@ -7,4 +7,5 @@ type UserRepository interface {
 	FindByEmail(email string) (*entities.User, error)
 	FindByID(id string) (*entities.User, error)
 	FindByInviteCode(inviteCode string) (*entities.User, error)
+	FindUsersOrderedByPoints(page int, limit int) ([]entities.User, error)
 }

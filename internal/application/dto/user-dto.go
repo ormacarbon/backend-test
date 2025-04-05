@@ -27,3 +27,13 @@ type LoadedUserOutput struct {
 	Email string `json:"email"`
 	Phone string `json:"phone"`
 }
+
+type GetUsersRankingInput struct {
+	PaginationInput
+}
+
+type UserRankingItem struct {
+	UserID string `json:"user_id"`
+	Name   string `json:"name"`
+	Points int    `json:"points"`
+}

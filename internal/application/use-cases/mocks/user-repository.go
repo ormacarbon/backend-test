@@ -41,6 +41,14 @@ func (m *MockUserRepository) FindByInviteCode(inviteCode string) (*entities.User
 	return nil, args.Error(1)
 }
 
+func (m *MockUserRepository) FindUsersOrderedByPoints(page int, limit int) ([]entities.User, error) {
+	args := m.Called(page, limit)
+	if users := args.Get(0); users != nil {
+		return users.([]entities.User), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func NewMockUserRepository() *MockUserRepository {
 	return new(MockUserRepository)
 }

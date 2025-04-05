@@ -60,3 +60,18 @@ func (r *UserGormRepository) FindByInviteCode(inviteCode string) (*entities.User
 	user := model.ToDomain()
 	return &user, nil
 }
+
+func (r *UserGormRepository) FindUsersOrderedByPoints(page int, limit int) ([]entities.User, error) {
+	var models []UserModel
+	err := r.db.Order("points desc").Offset(page * limit).Limit(limit).Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]entities.User, len(models))
+	for i, model := range models {
+		users[i] = model.ToDomain()
+	}
+
+	return users, nil
+}
