@@ -8,6 +8,7 @@ import (
 	output_ports "github.com/cassiusbessa/backend-test/internal/application/ports/output"
 	usecases "github.com/cassiusbessa/backend-test/internal/application/use-cases"
 	"github.com/cassiusbessa/backend-test/internal/infra/db"
+	"github.com/cassiusbessa/backend-test/internal/infra/email"
 	"github.com/cassiusbessa/backend-test/internal/infra/token"
 	"github.com/cassiusbessa/backend-test/internal/interfaces/http/handlers"
 )
@@ -15,6 +16,7 @@ import (
 type dependencies struct {
 	UserRepository output_ports.UserRepository
 	TokenService   output_ports.TokenService
+	EmailService   output_ports.EmailService
 }
 
 var (
@@ -33,6 +35,10 @@ func getDependencies() *dependencies {
 		depsInstance = &dependencies{
 			UserRepository: db.NewUserGormRepository(db.DB),
 			TokenService:   token.NewJWTService(jwtSecret, weekDuration),
+			EmailService: email.NewBrevoEmailService(
+				"cassiusbessa@gmail.com",
+				"bvio",
+			),
 		}
 	})
 
@@ -41,7 +47,7 @@ func getDependencies() *dependencies {
 
 func BuildCreateUserHandler() *handlers.CreateUserHandler {
 	deps := getDependencies()
-	useCase := usecases.NewCreateUserUseCase(deps.UserRepository)
+	useCase := usecases.NewCreateUserUseCase(deps.UserRepository, deps.EmailService)
 	return handlers.NewCreateUserHandler(useCase)
 }
 

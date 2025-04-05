@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"strconv"
+
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
 	output_ports "github.com/cassiusbessa/backend-test/internal/application/ports/output"
 	"github.com/cassiusbessa/backend-test/internal/domain/entities"
@@ -10,11 +12,12 @@ import (
 )
 
 type CreateUserUseCase struct {
-	userRepo output_ports.UserRepository
+	userRepo     output_ports.UserRepository
+	emailService output_ports.EmailService
 }
 
-func NewCreateUserUseCase(repo output_ports.UserRepository) *CreateUserUseCase {
-	return &CreateUserUseCase{userRepo: repo}
+func NewCreateUserUseCase(repo output_ports.UserRepository, emailService output_ports.EmailService) *CreateUserUseCase {
+	return &CreateUserUseCase{userRepo: repo, emailService: emailService}
 }
 
 func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserOutput, error) {
@@ -97,5 +100,21 @@ func (uc *CreateUserUseCase) processInviteCode(inviteCode *string) error {
 		return shared.ErrInternal
 	}
 
+	err = uc.emailService.SendEmail(
+		inviter.Email().Value(),
+		"New user invited by you",
+		uc.emailConfirmationToInviterBody(*inviter),
+	)
+	if err != nil {
+		return shared.ErrInternal
+	}
+
 	return nil
+}
+
+func (uc *CreateUserUseCase) emailConfirmationToInviterBody(inviter entities.User) string {
+	return "Hello " + inviter.Name() + ",\n\n" +
+		"Now you have " + strconv.Itoa(inviter.Points()) + " points.\n\n" +
+		"Best regards,\n" +
+		"bvio"
 }
