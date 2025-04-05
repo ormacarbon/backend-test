@@ -29,7 +29,7 @@ func main() {
 
 	app := fiber.New()
 
-	routes.SetupRoutes(app, cfg, logger)
+	routes.SetupRoutes(app, cfg, sugar)
 
 	listenAddr := ":" + cfg.ServerPort
 	sugar.Infow("Starting server", "address", listenAddr)

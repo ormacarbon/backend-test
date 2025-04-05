@@ -8,12 +8,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/icl00ud/backend-test/internal/dto"
 	"github.com/icl00ud/backend-test/internal/email"
+	"github.com/icl00ud/backend-test/internal/errs"
 	"github.com/icl00ud/backend-test/internal/model"
 	"github.com/icl00ud/backend-test/internal/repository"
 	"go.uber.org/zap"
 )
 
 type UserService interface {
+	GetUserByID(ctx context.Context, id string) (*model.User, error)
 	GetLeaderboard(ctx context.Context, limit int) ([]model.User, error)
 	FinishCompetition(ctx context.Context, limit int) ([]model.User, error)
 	RegisterUser(ctx context.Context, user *dto.RegisterUserRequest) (*model.User, error)
@@ -23,10 +25,10 @@ type UserService interface {
 type userService struct {
 	emailSvc email.EmailService
 	userRepo repository.UserRepository
-	logger   *zap.Logger
+	logger   *zap.SugaredLogger
 }
 
-func NewUserService(userRepo repository.UserRepository, emailSvc email.EmailService, logger *zap.Logger) UserService {
+func NewUserService(userRepo repository.UserRepository, emailSvc email.EmailService, logger *zap.SugaredLogger) UserService {
 	return &userService{
 		emailSvc: emailSvc,
 		userRepo: userRepo,
@@ -34,48 +36,61 @@ func NewUserService(userRepo repository.UserRepository, emailSvc email.EmailServ
 	}
 }
 
-func (s *userService) RegisterUser(ctx context.Context, user *dto.RegisterUserRequest) (*model.User, error) {
-	sugar := s.logger.Sugar()
-	sugar.Infow("Registering new user", "email", user.Email, "name", user.Name)
+func (s *userService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+	user, err := s.userRepo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 
-	referralToken := uuid.New().String()
+	if user == nil {
+		s.logger.Warnw("User not found", "id", id)
+		return nil, errs.New(errs.ErrUserNotFound.Error(), 404, errs.ErrUserNotFound)
+	}
+
+	return user, nil
+}
+
+func (s *userService) RegisterUser(ctx context.Context, user *dto.RegisterUserRequest) (*model.User, error) {
+	existingUser, err := s.userRepo.GetUserByEmail(ctx, user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingUser != nil {
+		s.logger.Warnw("Email already exists", "email", user.Email)
+		return nil, errs.New(errs.ErrEmailAlreadyExists.Error(), 409, errs.ErrEmailAlreadyExists)
+	}
+
 	userToCreate := &model.User{
 		Name:          user.Name,
 		Email:         user.Email,
 		Phone:         user.Phone,
-		Points:        1, // Start with 1 point
-		ReferralToken: referralToken,
+		Points:        1,
+		ReferralToken: uuid.New().String(),
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
 
 	if err := s.userRepo.CreateUser(ctx, userToCreate); err != nil {
-		// Error already logged in repository
 		return nil, err
 	}
 
-	sugar.Infow("User registered successfully", "userID", userToCreate.ID, "email", userToCreate.Email)
-	// Maybe send a welcome email?
-	// if err := s.emailSvc.SendEmail(userToCreate.Email, "Welcome!", "Thanks for registering..."); err != nil {
-	//  	sugar.Warnw("Failed to send welcome email", "userID", userToCreate.ID, "email", userToCreate.Email, "error", err)
-	// }
 	return userToCreate, nil
 }
 
 func (s *userService) RegisterUserWithReferral(ctx context.Context, user *dto.RegisterUserWithReferralRequest) (*model.User, error) {
-	sugar := s.logger.Sugar()
-	sugar.Infow("Registering new user with referral", "email", user.Email, "name", user.Name, "referralToken", user.ReferralToken)
+	s.logger.Infow("Registering new user with referral", "email", user.Email, "name", user.Name, "referralToken", user.ReferralToken)
 
 	referrer, err := s.userRepo.GetUserByReferralToken(ctx, user.ReferralToken)
 	if err != nil {
 		if errors.Is(err, errors.New("user not found")) {
-			sugar.Warnw("Invalid referral token provided (referrer not found)", "token", user.ReferralToken)
+			s.logger.Warnw("Invalid referral token provided (referrer not found)", "token", user.ReferralToken)
 			return nil, errors.New("invalid referral token") // Specific error for handler
 		}
 		// Other DB errors logged in repo
 		return nil, err // Propagate other errors
 	}
-	sugar.Infow("Referrer found", "referrerID", referrer.ID, "referrerEmail", referrer.Email)
+	s.logger.Infow("Referrer found", "referrerID", referrer.ID, "referrerEmail", referrer.Email)
 
 	referralToken := uuid.New().String()
 	userToCreate := &model.User{
@@ -88,32 +103,30 @@ func (s *userService) RegisterUserWithReferral(ctx context.Context, user *dto.Re
 		UpdatedAt:     time.Now(),
 	}
 
-	// Consider wrapping DB operations in a transaction
 	if err := s.userRepo.CreateUser(ctx, userToCreate); err != nil {
-		// Error logged in repository
 		return nil, err
 	}
-	sugar.Infow("Referred user created successfully", "userID", userToCreate.ID, "email", userToCreate.Email)
+	s.logger.Infow("Referred user created successfully", "userID", userToCreate.ID, "email", userToCreate.Email)
 
 	if err := s.userRepo.UpdateUserPoints(ctx, referrer.ID, 1); err != nil {
-		sugar.Errorw("Failed to update referrer points after successful referral (continuing registration)",
+		s.logger.Errorw("Failed to update referrer points after successful referral (continuing registration)",
 			"referrerID", referrer.ID,
 			"referredUserID", userToCreate.ID,
 			"error", err,
 		)
 	} else {
-		sugar.Infow("Awarded point to referrer", "referrerID", referrer.ID, "referredUserID", userToCreate.ID)
+		s.logger.Infow("Awarded point to referrer", "referrerID", referrer.ID, "referredUserID", userToCreate.ID)
 
 		subject := "You've received an extra point!"
 		body := "Congratulations! A new user has registered using your referral link, and you've earned an extra point."
 		if emailErr := s.emailSvc.SendEmail(referrer.Email, subject, body); emailErr != nil {
-			sugar.Warnw("Failed to send referral bonus email",
+			s.logger.Warnw("Failed to send referral bonus email",
 				"recipient", referrer.Email,
 				"referrerID", referrer.ID,
 				"error", emailErr,
 			)
 		} else {
-			sugar.Infow("Sent referral bonus email", "recipient", referrer.Email, "referrerID", referrer.ID)
+			s.logger.Infow("Sent referral bonus email", "recipient", referrer.Email, "referrerID", referrer.ID)
 		}
 	}
 
@@ -121,15 +134,14 @@ func (s *userService) RegisterUserWithReferral(ctx context.Context, user *dto.Re
 }
 
 func (s *userService) GetLeaderboard(ctx context.Context, limit int) ([]model.User, error) {
-	sugar := s.logger.Sugar()
-	sugar.Infow("Getting leaderboard", "limit", limit)
+	s.logger.Infow("Getting leaderboard", "limit", limit)
 
 	users, err := s.userRepo.GetTopUsers(ctx, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	sugar.Infow("Leaderboard retrieved successfully", "limit", limit, "count", len(users))
+	s.logger.Infow("Leaderboard retrieved successfully", "limit", limit, "count", len(users))
 	return users, nil
 }
 
