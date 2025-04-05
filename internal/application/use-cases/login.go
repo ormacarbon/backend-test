@@ -24,7 +24,11 @@ func NewLoginUserUseCase(
 func (uc *LoginUserUseCase) Execute(input dto.LoginInput) (dto.LoginOutput, error) {
 	user, err := uc.userRepo.FindByEmail(input.Email)
 	if err != nil {
-		return dto.LoginOutput{}, shared.ErrNotFound
+		return dto.LoginOutput{}, shared.ErrInternal
+	}
+
+	if user == nil {
+		return dto.LoginOutput{}, shared.ErrAuthorization
 	}
 
 	if !user.Password().Compare(input.Password) {
