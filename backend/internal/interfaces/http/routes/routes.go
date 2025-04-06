@@ -24,3 +24,8 @@ func WithUsersRanking(g *gin.RouterGroup) {
 	handler := factory.BuildLoadUsersOrderedByPointsHandler()
 	g.GET("/users/ranking", handler.Execute)
 }
+
+func WithFinishCompetition(g *gin.RouterGroup) {
+	handler := factory.BuildFinishCompetitionHandler()
+	g.POST("/admin/competition/finish", handler.Execute)
+}

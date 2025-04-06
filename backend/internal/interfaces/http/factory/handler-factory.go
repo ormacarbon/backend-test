@@ -68,3 +68,9 @@ func BuildLoadUsersOrderedByPointsHandler() *handlers.LoadUsersOrderedByPointsHa
 	useCase := usecases.NewLoadUsersOrderedByPointsUseCase(deps.UserRepository)
 	return handlers.NewLoadUsersOrderedByPointsHandler(useCase)
 }
+
+func BuildFinishCompetitionHandler() *handlers.FinishCompetitionHandler {
+	deps := getDependencies()
+	useCase := usecases.NewFinishCompetitionUseCase(deps.UserRepository, deps.EmailService)
+	return handlers.NewFinishCompetitionHandler(useCase)
+}

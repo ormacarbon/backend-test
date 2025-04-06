@@ -44,6 +44,7 @@ func main() {
 	routes.WithLogin(api)
 	routes.WithLoadUserByToken(api)
 	routes.WithUsersRanking(api)
+	routes.WithFinishCompetition(api)
 
 	log.Printf("Server running on port %s 🚀", port)
 	if err := r.Run(":" + port); err != nil {
