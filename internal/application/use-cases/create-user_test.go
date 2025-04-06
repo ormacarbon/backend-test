@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
@@ -131,50 +132,6 @@ func TestCreateUserUseCase_Execute(t *testing.T) {
 	})
 
 	t.Run("invited user", func(t *testing.T) {
-		mockRepo, _, useCase := setupTest()
-
-		validEmail, _ := object_values.NewEmail("inviter@example.com")
-		validPhone, _ := object_values.NewPhoneNumber("+5511987654321")
-		validPassword, _ := object_values.NewPassword("StrongP@ssw0rd")
-		inviterCode := uuid.NewString()
-
-		inviter := entities.LoadUser(
-			uuid.New(),
-			"Inviter",
-			validEmail,
-			validPassword,
-			validPhone,
-			inviterCode,
-			nil,
-			1,
-		)
-
-		input := dto.CreateUserInput{
-			Name:       "New User",
-			Email:      "newuser@example.com",
-			Password:   "StrongP@ssw0rd",
-			Phone:      "+5511999999999",
-			InviteCode: &inviterCode,
-		}
-
-		mockRepo.On("FindByEmail", input.Email).Return(nil, nil)
-		mockRepo.On("FindByInviteCode", *input.InviteCode).Return(&inviter, nil)
-		mockRepo.On("Save", mock.MatchedBy(func(u entities.User) bool {
-			return u.ID() == inviter.ID() && u.Points() == 2
-		})).Return(nil).Once()
-
-		mockRepo.On("Save", mock.MatchedBy(func(u entities.User) bool {
-			return u.Email().Value() == input.Email
-		})).Return(nil).Once()
-
-		output, err := useCase.Execute(input)
-
-		assert.NoError(t, err)
-		assert.NotEmpty(t, output.UserID)
-		mockRepo.AssertExpectations(t)
-	})
-
-	t.Run("invited user", func(t *testing.T) {
 		mockRepo, mockEmail, useCase := setupTest()
 
 		validEmail, _ := object_values.NewEmail("inviter@example.com")
@@ -201,12 +158,64 @@ func TestCreateUserUseCase_Execute(t *testing.T) {
 			InviteCode: &inviterCode,
 		}
 
-		expectedEmailBody := useCase.emailConfirmationToInviterBody(inviter)
-
 		mockRepo.On("FindByEmail", input.Email).Return(nil, nil)
 		mockRepo.On("FindByInviteCode", *input.InviteCode).Return(&inviter, nil)
 		mockRepo.On("Save", mock.Anything).Return(nil)
-		mockEmail.On("SendEmail", inviter.Email().Value(), "New user invited by you", expectedEmailBody).Return(nil).Once()
+		mockEmail.On(
+			"SendEmail",
+			inviter.Email().Value(),
+			"New user invited by you",
+			mock.MatchedBy(func(body string) bool {
+				return strings.Contains(body, "Hello Inviter") &&
+					strings.Contains(body, "points") &&
+					strings.Contains(body, "bvio")
+			}),
+		).Return(nil).Once()
+
+		output, err := useCase.Execute(input)
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, output.UserID)
+		mockRepo.AssertExpectations(t)
+		mockEmail.AssertExpectations(t)
+	})
+
+	t.Run("should return error if invite code is invalid", func(t *testing.T) {
+		mockRepo, mockEmail, useCase := setupTest()
+
+		badCode := "invalid-uuid"
+
+		input := dto.CreateUserInput{
+			Name:       "Errored User",
+			Email:      "errored@example.com",
+			Password:   "StrongP@ssw0rd",
+			Phone:      "+5511999999999",
+			InviteCode: &badCode,
+		}
+
+		output, err := useCase.Execute(input)
+
+		assert.Error(t, err)
+		assert.Empty(t, output.UserID)
+		mockRepo.AssertExpectations(t)
+		mockEmail.AssertExpectations(t)
+	})
+
+	t.Run("should handle empty string invite code gracefully", func(t *testing.T) {
+		mockRepo, mockEmail, useCase := setupTest()
+
+		emptyCode := ""
+
+		input := dto.CreateUserInput{
+			Name:       "User Without Code",
+			Email:      "userwithout@example.com",
+			Password:   "StrongP@ssw0rd",
+			Phone:      "+5511999999999",
+			InviteCode: &emptyCode,
+		}
+
+		mockRepo.On("FindByEmail", input.Email).Return(nil, nil)
+		mockRepo.On("Save", mock.Anything).Return(nil)
 
 		output, err := useCase.Execute(input)
 

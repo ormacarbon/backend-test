@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"log"
 	"strconv"
 
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
@@ -50,23 +51,27 @@ func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserO
 func (uc *CreateUserUseCase) createUserDTOToUser(input dto.CreateUserInput) (*entities.User, error) {
 	email, err := object_values.NewEmail(input.Email)
 	if err != nil {
+		log.Println("Error creating email:", err)
 		return nil, err
 	}
 
 	password, err := object_values.NewPassword(input.Password)
 	if err != nil {
+		log.Println("Error creating password:", err)
 		return nil, err
 	}
 
 	phone, err := object_values.NewPhoneNumber(input.Phone)
 	if err != nil {
+		log.Println("Error creating phone number:", err)
 		return nil, err
 	}
 
 	var inviteCode *uuid.UUID
-	if input.InviteCode != nil {
+	if input.InviteCode != nil && *input.InviteCode != "" {
 		inviteCodeUUID, err := uuid.Parse(*input.InviteCode)
 		if err != nil {
+			log.Println("Error parsing invite code:", err)
 			return nil, err
 		}
 		inviteCode = &inviteCodeUUID
@@ -74,6 +79,7 @@ func (uc *CreateUserUseCase) createUserDTOToUser(input dto.CreateUserInput) (*en
 
 	user, err := entities.NewUser(input.Name, email, password, phone, inviteCode)
 	if err != nil {
+		log.Println("Error creating user:", err)
 		return nil, err
 	}
 
@@ -81,7 +87,7 @@ func (uc *CreateUserUseCase) createUserDTOToUser(input dto.CreateUserInput) (*en
 }
 
 func (uc *CreateUserUseCase) processInviteCode(inviteCode *string) error {
-	if inviteCode == nil {
+	if inviteCode == nil || *inviteCode == "" {
 		return nil
 	}
 
@@ -95,17 +101,15 @@ func (uc *CreateUserUseCase) processInviteCode(inviteCode *string) error {
 	}
 
 	inviter.AddPoint()
-	err = uc.userRepo.Save(*inviter)
-	if err != nil {
+	if err := uc.userRepo.Save(*inviter); err != nil {
 		return shared.ErrInternal
 	}
 
-	err = uc.emailService.SendEmail(
+	if err := uc.emailService.SendEmail(
 		inviter.Email().Value(),
 		"New user invited by you",
 		uc.emailConfirmationToInviterBody(*inviter),
-	)
-	if err != nil {
+	); err != nil {
 		return shared.ErrInternal
 	}
 
