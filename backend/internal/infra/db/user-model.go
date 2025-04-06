@@ -10,7 +10,7 @@ type UserModel struct {
 	ID         uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name       string     `gorm:"column:name;not null"`
 	Email      string     `gorm:"column:email;unique;not null"`
-	Phone      string     `gorm:"column:phone;unique;not null"`
+	Phone      string     `gorm:"column:phone;not null"`
 	Password   string     `gorm:"column:password;not null"`
 	InviteCode string     `gorm:"column:invite_code;unique;not null"`
 	InvitedBy  *uuid.UUID `gorm:"column:invited_by"`

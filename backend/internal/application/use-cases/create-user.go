@@ -35,14 +35,14 @@ func (uc *CreateUserUseCase) Execute(input dto.CreateUserInput) (dto.CreateUserO
 		return dto.CreateUserOutput{}, shared.ErrConflictError
 	}
 
-	err = uc.processInviteCode(input.InviteCode)
-	if err != nil {
-		return dto.CreateUserOutput{}, err
-	}
-
 	err = uc.userRepo.Save(*newUser)
 	if err != nil {
 		return dto.CreateUserOutput{}, shared.ErrInternal
+	}
+
+	err = uc.processInviteCode(input.InviteCode)
+	if err != nil {
+		return dto.CreateUserOutput{}, err
 	}
 
 	return dto.CreateUserOutput{UserID: newUser.ID().String()}, nil
