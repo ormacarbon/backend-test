@@ -75,3 +75,7 @@ func (r *UserGormRepository) FindUsersOrderedByPoints(page int, limit int) ([]en
 
 	return users, nil
 }
+
+func (r *UserGormRepository) ResetAllScores() error {
+	return r.db.Model(&UserModel{}).Update("points", 0).Error
+}

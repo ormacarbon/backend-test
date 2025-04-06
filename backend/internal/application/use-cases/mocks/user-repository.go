@@ -49,6 +49,14 @@ func (m *MockUserRepository) FindUsersOrderedByPoints(page int, limit int) ([]en
 	return nil, args.Error(1)
 }
 
+func (m *MockUserRepository) ResetAllScores() error {
+	args := m.Called()
+	if err := args.Error(0); err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewMockUserRepository() *MockUserRepository {
 	return new(MockUserRepository)
 }

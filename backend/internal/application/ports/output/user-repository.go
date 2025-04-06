@@ -8,4 +8,5 @@ type UserRepository interface {
 	FindByID(id string) (*entities.User, error)
 	FindByInviteCode(inviteCode string) (*entities.User, error)
 	FindUsersOrderedByPoints(page int, limit int) ([]entities.User, error)
+	ResetAllScores() error
 }
