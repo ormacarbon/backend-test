@@ -22,10 +22,12 @@ type LoginOutput struct {
 }
 
 type LoadedUserOutput struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Phone string `json:"phone"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	LinkCode string `json:"link_code"`
+	Points   int    `json:"points"`
 }
 
 type GetUsersRankingInput struct {

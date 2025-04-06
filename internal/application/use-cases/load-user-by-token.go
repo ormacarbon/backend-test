@@ -1,9 +1,12 @@
 package usecases
 
 import (
+	"os"
+
 	"github.com/cassiusbessa/backend-test/internal/application/dto"
 	input_ports "github.com/cassiusbessa/backend-test/internal/application/ports/input"
 	output_ports "github.com/cassiusbessa/backend-test/internal/application/ports/output"
+	"github.com/cassiusbessa/backend-test/internal/domain/entities"
 )
 
 type LoadUserByTokenUseCase struct {
@@ -36,9 +39,15 @@ func (uc LoadUserByTokenUseCase) Execute(token string) (*dto.LoadedUserOutput, e
 		return nil, nil
 	}
 	return &dto.LoadedUserOutput{
-		ID:    user.ID().String(),
-		Name:  user.Name(),
-		Email: user.Email().Value(),
-		Phone: user.Phone().Value(),
+		ID:       user.ID().String(),
+		Name:     user.Name(),
+		Email:    user.Email().Value(),
+		Phone:    user.Phone().Value(),
+		LinkCode: uc.codeToLink(*user),
+		Points:   user.Points(),
 	}, nil
+}
+
+func (uc LoadUserByTokenUseCase) codeToLink(u entities.User) string {
+	return os.Getenv("REACT_APP_URL") + "/?" + "invite=" + u.InviteCode()
 }
