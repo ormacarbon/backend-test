@@ -11,10 +11,10 @@ func TestNewPhoneNumber(t *testing.T) {
 		phone       string
 		expectError bool
 	}{
-		{"+14155552671", false},   // Válido: EUA
-		{"+5511987654321", false}, // Válido: Brasil
-		{"+442071838750", false},  // Válido: Reino Unido
-		{"+123", true},            // Inválido: Muito curto
+		{"+14155552671", false},   // Valid: EUA
+		{"+5511987654321", false}, // Valid: Brasil
+		{"+442071838750", false},  // Valid: Reino Unido
+		{"+123", true},            // Invalid: Muito curto
 	}
 
 	for _, tt := range tests {

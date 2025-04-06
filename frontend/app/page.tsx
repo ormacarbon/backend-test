@@ -13,7 +13,6 @@ export default function Home() {
 
   const [isLogin, setIsLogin] = useState(true);
 
-  // Se tiver código de convite, mostra o formulário de registro direto
   useEffect(() => {
     if (inviteCode) {
       setIsLogin(false);

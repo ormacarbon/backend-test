@@ -18,20 +18,18 @@ func Connect() {
 
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Warn), // ou Info, Warn
+		Logger: logger.Default.LogMode(logger.Warn),
 	})
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to database: %v", err)
 	}
 
-	// Testa a conexão com timeout
 	sqlDB, err := DB.DB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	sqlDB.SetConnMaxLifetime(time.Minute * 5)
 
-	// Executa as migrations
 	if err := DB.AutoMigrate(&UserModel{}); err != nil {
 		log.Fatalf("❌ Failed to migrate database: %v", err)
 	}
