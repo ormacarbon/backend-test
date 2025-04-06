@@ -10,6 +10,8 @@ interface User {
   name: string;
   email: string;
   phone: string;
+  points: number;
+  link_code: string;
 }
 
 interface RankingUser {
@@ -37,6 +39,7 @@ export default function Dashboard() {
           getMe(token),
           getRanking(),
         ]);
+        console.log(userData);
         setUser(userData);
         setRanking(rankingData);
       } catch (err) {
@@ -50,7 +53,7 @@ export default function Dashboard() {
 
   const handleCopyInviteCode = () => {
     if (user) {
-      navigator.clipboard.writeText(user.id);
+      navigator.clipboard.writeText(user.link_code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -86,6 +89,7 @@ export default function Dashboard() {
               <p><span className="font-medium">Nome:</span> {user.name}</p>
               <p><span className="font-medium">Email:</span> {user.email}</p>
               <p><span className="font-medium">Telefone:</span> {user.phone}</p>
+              <p><span className="font-medium">Pontos:</span> {user.points}</p>
               <div className="mt-4">
                 <p className="font-medium mb-2">Seu código de convite:</p>
                 <button
