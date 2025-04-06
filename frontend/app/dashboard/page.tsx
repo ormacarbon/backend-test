@@ -39,7 +39,6 @@ export default function Dashboard() {
           getMe(token),
           getRanking(),
         ]);
-        console.log(userData);
         setUser(userData);
         setRanking(rankingData);
       } catch (err) {
