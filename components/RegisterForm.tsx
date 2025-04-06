@@ -1,16 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createUser } from '@/lib/services/api';
 
-export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
+interface Props {
+  onSuccess: () => void;
+  inviteCode?: string;
+}
+
+export default function RegisterForm({ onSuccess, inviteCode }: Props) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     phone: '',
-    invite_code: '',
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +25,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     setLoading(true);
 
     try {
-      await createUser(formData);
+      await createUser({ ...formData, invite_code: inviteCode });
       onSuccess();
     } catch (err) {
       setError('Erro ao criar conta. Verifique os dados e tente novamente.');
@@ -80,17 +85,6 @@ export default function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
           onChange={handleChange}
           className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Código de convite (opcional)</label>
-        <input
-          type="text"
-          name="invite_code"
-          value={formData.invite_code}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
       </div>
 
