@@ -1,16 +1,12 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;
   points: number;
-}
-
-export interface Referral {
-  id: string;
+  referralToken: string;
   createdAt: string;
-  referrerId: string;
-  referredId: string;
+  updatedAt: string;
 }
 
 export interface UserRegister {

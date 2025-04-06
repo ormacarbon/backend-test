@@ -10,14 +10,14 @@ import (
 )
 
 type LeaderboardHandler struct {
-	userService service.UserService
-	logger      *zap.SugaredLogger
+	leaderboardService service.LeaderboardService
+	logger             *zap.SugaredLogger
 }
 
-func NewLeaderboardHandler(userService service.UserService, logger *zap.SugaredLogger) *LeaderboardHandler {
+func NewLeaderboardHandler(leaderboardService service.LeaderboardService, logger *zap.SugaredLogger) *LeaderboardHandler {
 	return &LeaderboardHandler{
-		userService: userService,
-		logger:      logger.Named("LeaderboardHandler"),
+		leaderboardService: leaderboardService,
+		logger:             logger.Named("LeaderboardHandler"),
 	}
 }
 
@@ -34,7 +34,7 @@ func (h *LeaderboardHandler) GetLeaderboard(c *fiber.Ctx) error {
 		h.logger.Infow("Using limit parameter", "limit", limit)
 	}
 
-	users, err := h.userService.GetLeaderboard(context.Background(), limit)
+	users, err := h.leaderboardService.GetLeaderboard(context.Background(), limit)
 	if err != nil {
 		h.logger.Errorw("Failed to get leaderboard from service", "limit", limit, "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to retrieve leaderboard"})

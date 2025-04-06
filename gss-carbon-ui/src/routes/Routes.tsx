@@ -14,7 +14,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/admin" element={<Admin />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/success/:userId" element={<RegistrationSuccessful />} />
+        <Route
+          path="/success/:referralToken"
+          element={<RegistrationSuccessful />}
+        />
       </Routes>
     </Router>
   );

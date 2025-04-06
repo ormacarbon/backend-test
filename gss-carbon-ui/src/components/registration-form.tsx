@@ -1,8 +1,9 @@
+import React from "react";
 import { useRegisterUser } from "@/hooks/useUser";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Loader2 } from "lucide-react";
-import React from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -19,6 +20,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
   referralCode,
 }) => {
   const { mutateAsync, isPending } = useRegisterUser();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -28,7 +30,14 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
   });
 
   const onSubmit = async (data: SignUpSchemaType) => {
-    await mutateAsync({ ...data, referralCode });
+    try {
+      const response = await mutateAsync({ ...data, referralCode });
+      if (response.status === 201) {
+        navigate(`/success/${response.data.referralToken}`);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+    }
   };
 
   return (
@@ -41,7 +50,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
           id="name"
           placeholder="Enter your full name"
           {...register("name")}
-          className={`border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 ${errors.name ? "border-red-300 ring-1 ring-red-300" : ""}`}
+          className={`border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 ${
+            errors.name ? "border-red-300 ring-1 ring-red-300" : ""
+          }`}
           disabled={isPending}
         />
         {errors.name && (

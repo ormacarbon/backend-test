@@ -16,27 +16,26 @@ import (
 
 type UserService interface {
 	GetUserByID(ctx context.Context, id string) (*model.User, error)
-	GetLeaderboard(ctx context.Context, limit int) ([]model.User, error)
-	FinishCompetition(ctx context.Context, limit int) ([]model.User, error)
+	GetUserByReferralToken(ctx context.Context, token string) (*model.User, error)
 	RegisterUser(ctx context.Context, user *dto.RegisterUserRequest) (*model.User, error)
 	RegisterUserWithReferral(ctx context.Context, user *dto.RegisterUserWithReferralRequest) (*model.User, error)
 }
 
-type userService struct {
+type UserServiceImpl struct {
 	emailSvc email.EmailService
 	userRepo repository.UserRepository
 	logger   *zap.SugaredLogger
 }
 
 func NewUserService(userRepo repository.UserRepository, emailSvc email.EmailService, logger *zap.SugaredLogger) UserService {
-	return &userService{
+	return &UserServiceImpl{
 		emailSvc: emailSvc,
 		userRepo: userRepo,
 		logger:   logger.Named("UserService"),
 	}
 }
 
-func (s *userService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+func (s *UserServiceImpl) GetUserByID(ctx context.Context, id string) (*model.User, error) {
 	user, err := s.userRepo.GetUserByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -50,7 +49,21 @@ func (s *userService) GetUserByID(ctx context.Context, id string) (*model.User, 
 	return user, nil
 }
 
-func (s *userService) RegisterUser(ctx context.Context, user *dto.RegisterUserRequest) (*model.User, error) {
+func (s *UserServiceImpl) GetUserByReferralToken(ctx context.Context, token string) (*model.User, error) {
+	user, err := s.userRepo.GetUserByReferralToken(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		s.logger.Warnw("User not found", "token", token)
+		return nil, errs.New(errs.ErrUserNotFound.Error(), 404, errs.ErrUserNotFound)
+	}
+
+	return user, nil
+}
+
+func (s *UserServiceImpl) RegisterUser(ctx context.Context, user *dto.RegisterUserRequest) (*model.User, error) {
 	existingUser, err := s.userRepo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
 		return nil, err
@@ -78,7 +91,7 @@ func (s *userService) RegisterUser(ctx context.Context, user *dto.RegisterUserRe
 	return userToCreate, nil
 }
 
-func (s *userService) RegisterUserWithReferral(ctx context.Context, user *dto.RegisterUserWithReferralRequest) (*model.User, error) {
+func (s *UserServiceImpl) RegisterUserWithReferral(ctx context.Context, user *dto.RegisterUserWithReferralRequest) (*model.User, error) {
 	s.logger.Infow("Registering new user with referral", "email", user.Email, "name", user.Name, "referralToken", user.ReferralToken)
 
 	referrer, err := s.userRepo.GetUserByReferralToken(ctx, user.ReferralToken)
@@ -131,31 +144,4 @@ func (s *userService) RegisterUserWithReferral(ctx context.Context, user *dto.Re
 	}
 
 	return userToCreate, nil
-}
-
-func (s *userService) GetLeaderboard(ctx context.Context, limit int) ([]model.User, error) {
-	s.logger.Infow("Getting leaderboard", "limit", limit)
-
-	users, err := s.userRepo.GetTopUsers(ctx, limit)
-	if err != nil {
-		return nil, err
-	}
-
-	s.logger.Infow("Leaderboard retrieved successfully", "limit", limit, "count", len(users))
-	return users, nil
-}
-
-func (s *userService) FinishCompetition(ctx context.Context, limit int) ([]model.User, error) {
-	winners, err := s.userRepo.GetTopUsers(ctx, limit)
-	if err != nil {
-		return nil, err
-	}
-
-	subject := "Congratulations, you're a winner!"
-	for _, user := range winners {
-		body := "You have been selected as one of the top winners in the competition."
-		_ = s.emailSvc.SendEmail(user.Email, subject, body)
-	}
-
-	return winners, nil
 }

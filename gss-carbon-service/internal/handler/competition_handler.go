@@ -10,14 +10,14 @@ import (
 )
 
 type CompetitionHandler struct {
-	userService service.UserService
-	logger      *zap.SugaredLogger
+	competitionService service.CompetitionService
+	logger             *zap.SugaredLogger
 }
 
-func NewCompetitionHandler(userService service.UserService, logger *zap.SugaredLogger) *CompetitionHandler {
+func NewCompetitionHandler(competitionService service.CompetitionService, logger *zap.SugaredLogger) *CompetitionHandler {
 	return &CompetitionHandler{
-		userService: userService,
-		logger:      logger.Named("CompetitionHandler"),
+		competitionService: competitionService,
+		logger:             logger.Named("CompetitionHandler"),
 	}
 }
 
@@ -34,7 +34,7 @@ func (h *CompetitionHandler) FinishCompetition(c *fiber.Ctx) error {
 		h.logger.Infow("Using limit parameter", "limit", limit)
 	}
 
-	winners, err := h.userService.FinishCompetition(context.Background(), limit)
+	winners, err := h.competitionService.FinishCompetition(context.Background(), limit)
 	if err != nil {
 		h.logger.Errorw("Failed to finish competition in service", "limit", limit, "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to finish competition"})

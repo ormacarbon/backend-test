@@ -31,12 +31,14 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) 
 	// --- Services ---
 	emailSvc := email.NewEmailService(logger)
 	userService := service.NewUserService(userRepo, emailSvc, logger)
+	competitionService := service.NewCompetitionService(userRepo, emailSvc)
+	leaderboardService := service.NewLeaderboardService(userRepo, logger)
 
 	// --- Handlers ---
 	healthHandler := handler.NewHealthHandler(db, logger)
 	userHandler := handler.NewUserHandler(userService, logger)
-	leaderboardHandler := handler.NewLeaderboardHandler(userService, logger)
-	competitionHandler := handler.NewCompetitionHandler(userService, logger)
+	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService, logger)
+	competitionHandler := handler.NewCompetitionHandler(competitionService, logger)
 
 	app.Use(middleware.SetupCors())
 
@@ -46,14 +48,17 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) 
 	api.Get("/health/ping", healthHandler.Ping)
 	api.Get("/health/check", healthHandler.Checker)
 
-	// User endpoints
-	api.Get("/user/:id", userHandler.GetUserByID)
-	api.Post("/register", userHandler.RegisterUser)
-	api.Post("/register/referral", userHandler.RegisterUserWithReferral)
+	// Endpoints //
 
-	// Leaderboard endpoints
+	// User
+	api.Get("/user/:id", userHandler.GetUserByID)
+	api.Get("/user/referral/:token", userHandler.GetUserByReferralToken)
+	api.Post("/user/register", userHandler.RegisterUser)
+	api.Post("/user	/register/referral", userHandler.RegisterUserWithReferral)
+
+	// Leaderboard
 	api.Get("/leaderboard", leaderboardHandler.GetLeaderboard)
 
-	// Competition endpoints
+	// Competition
 	api.Post("/competition/finish", competitionHandler.FinishCompetition)
 }

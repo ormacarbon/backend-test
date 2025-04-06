@@ -1,11 +1,15 @@
 import React from "react";
 import RegistrationForm from "../components/registration-form";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, UserCircle } from "lucide-react";
+import { useGetUserByReferralToken } from "@/hooks/useUser";
 
 const Register: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const referralCode = searchParams.get("ref") || null;
+  const referralToken = searchParams.get("ref") || null;
+  const { data: userData, isLoading } = useGetUserByReferralToken(
+    referralToken!,
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -22,19 +26,28 @@ const Register: React.FC = () => {
           <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-8 text-white">
             <h1 className="text-2xl font-bold">Join the Competition</h1>
             <p className="mt-2 text-emerald-50">
-              Register to earn your first point and get your unique sharing link
+              Register to earn your first point and grab your unique sharing
+              link.
             </p>
           </div>
 
-          <div className="px-6 py-8">
-            {referralCode && (
-              <div className="mb-6 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800">
-                You were invited by a friend! They'll earn a point when you
-                register.
+          <div className="px-6 py-8 space-y-6">
+            {referralToken && (
+              <div className="flex items-center gap-4 rounded-lg bg-emerald-100 p-4 text-sm text-emerald-800 shadow-md">
+                <UserCircle className="h-6 w-6 text-emerald-600" />
+                <p>
+                  You were invited by{" "}
+                  {isLoading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    userData?.data.name.split(" ")[0] || "a friend"
+                  )}
+                  . Your awesome referrer gets a point when you sign up! 😄
+                </p>
               </div>
             )}
 
-            <RegistrationForm referralCode={referralCode} />
+            <RegistrationForm referralCode={referralToken} />
           </div>
         </div>
       </div>

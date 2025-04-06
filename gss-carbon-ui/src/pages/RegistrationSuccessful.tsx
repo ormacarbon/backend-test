@@ -1,52 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useGetUserByReferralToken } from "@/hooks/useUser";
 import { Button } from "../components/ui/button";
-import { ArrowLeft, Award, Share2 } from "lucide-react";
+import { ArrowLeft, Award, Share2, Loader2 } from "lucide-react";
 import ShareSection from "../components/share-section";
 
-interface User {
-  id: string;
-  name: string;
-  points: number;
-}
-
 const RegistrationSuccessful: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { referralToken } = useParams<{ referralToken: string }>();
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: userData, isLoading } = useGetUserByReferralToken(
+    referralToken!,
+  );
 
   useEffect(() => {
-    async function fetchUser() {
-      if (!userId) {
-        navigate("/");
-        return;
-      }
-
-      try {
-        const data = await getUserById(userId);
-        if (!data) {
-          navigate("/");
-          return;
-        }
-        setUser(data);
-      } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
-        navigate("/");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchUser();
-  }, [userId, navigate]);
-
-  if (loading) {
-    return <div>Carregando...</div>;
-  }
-
-  if (!user) {
-    return null;
-  }
+    if (!referralToken) navigate("/");
+  }, [referralToken, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -59,7 +27,7 @@ const RegistrationSuccessful: React.FC = () => {
           Back to home
         </Link>
 
-        <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
+        <div className="mt-6 rounded-2xl bg-white shadow-xl">
           <div className="relative bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-12 text-center text-white">
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 transform">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-500 shadow-lg">
@@ -68,13 +36,23 @@ const RegistrationSuccessful: React.FC = () => {
             </div>
             <h1 className="text-2xl font-bold">Registration Successful!</h1>
             <p className="mt-2 text-emerald-50">
-              Congratulations, {user.name}! You've earned your first point.
+              Congratulations,{" "}
+              {isLoading ? (
+                <Loader2 className="inline-block h-4 w-4 animate-spin" />
+              ) : (
+                userData?.data.name.split(" ")[0]
+              )}
+              ! You've earned your first point.
             </p>
 
             <div className="mt-4 inline-flex items-center rounded-full bg-white/20 px-4 py-2 text-sm font-medium backdrop-blur-sm">
               <span>Your current score:</span>
               <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-emerald-600">
-                {user.points} points
+                {isLoading ? (
+                  <Loader2 className="inline-block h-4 w-4 animate-spin" />
+                ) : (
+                  `${userData?.data.points} points`
+                )}
               </span>
             </div>
           </div>
@@ -93,13 +71,14 @@ const RegistrationSuccessful: React.FC = () => {
               </p>
             </div>
 
-            <ShareSection userId={userId as string} />
+            {referralToken && <ShareSection referralToken={referralToken} />}
 
             <div className="mt-8 text-center">
               <Link to="/leaderboard">
                 <Button
                   variant="outline"
                   className="border-emerald-500 text-emerald-700 hover:bg-emerald-50"
+                  disabled={isLoading}
                 >
                   View Leaderboard
                 </Button>

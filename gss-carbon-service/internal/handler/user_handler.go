@@ -41,7 +41,23 @@ func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(user)
 }
 
-// RegisterUser register user without refferal token
+func (h *UserHandler) GetUserByReferralToken(c *fiber.Ctx) error {
+	h.logger.Info("Received request to get user by referral token")
+	token := c.Params("token")
+	user, err := h.userService.GetUserByReferralToken(context.Background(), token)
+	if err != nil {
+		h.logger.Errorw("Failed to get user by referral token", "token", token, "error", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get user"})
+	}
+
+	if user == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "user not found"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(user)
+}
+
+// RegisterUser register user without referral token
 func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
 	h.logger.Info("Received request to register user")
 

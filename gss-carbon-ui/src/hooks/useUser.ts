@@ -1,7 +1,11 @@
 import { User, UserRegister } from "@/interfaces/user.interface";
 import { queryKeys } from "@/query/queryKeys";
-import { registerUser } from "@/services/userService";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getUserById,
+  getUserByReferralToken,
+  registerUser,
+} from "@/services/userService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse, AxiosError } from "axios";
 import { toast } from "react-toastify";
 
@@ -20,5 +24,21 @@ export const useRegisterUser = () => {
         });
       }
     },
+  });
+};
+
+export const useGetUserById = (userId?: string) => {
+  return useQuery<AxiosResponse<User>, AxiosError>({
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId!),
+    enabled: Boolean(userId),
+  });
+};
+
+export const useGetUserByReferralToken = (token: string) => {
+  return useQuery<AxiosResponse<User>, AxiosError, AxiosResponse<User>>({
+    queryKey: queryKeys.userByReferralToken(token),
+    queryFn: () => getUserByReferralToken(token),
+    enabled: Boolean(token),
   });
 };

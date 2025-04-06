@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Copy, Facebook, Twitter, MessageCircle } from "lucide-react";
+import { Copy, Check, Facebook, Twitter, MessageCircle } from "lucide-react";
 
 interface ShareSectionProps {
-  userId: string;
+  referralToken: string;
 }
 
-const ShareSection: React.FC<ShareSectionProps> = ({ userId }) => {
+const ShareSection: React.FC<ShareSectionProps> = ({ referralToken }) => {
   const [shareUrl, setShareUrl] = useState("");
-  // ver o uso de toast
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Cria a URL de referência usando o ID do usuário
     const baseUrl = window.location.origin;
-    setShareUrl(`${baseUrl}/register?ref=${userId}`);
-  }, [userId]);
+    setShareUrl(`${baseUrl}/register?ref=${referralToken}`);
+  }, [referralToken]);
 
-  const copyToClipboard = async () => {};
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy the link.", error);
+    }
+  };
 
   const shareOnSocialMedia = (platform: string) => {
     let shareLink = "";
@@ -53,21 +60,21 @@ const ShareSection: React.FC<ShareSectionProps> = ({ userId }) => {
           <Input
             value={shareUrl}
             readOnly
-            className="pr-10 border-slate-200 bg-slate-50 text-slate-800"
+            className="border-slate-200 bg-slate-50 text-slate-800"
           />
-          <button
-            onClick={copyToClipboard}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 focus:outline-none"
-            aria-label="Copy to clipboard"
-          >
-            <Copy className="h-5 w-5" />
-          </button>
         </div>
         <Button
           onClick={copyToClipboard}
           variant="outline"
           className="shrink-0 border-emerald-500 text-emerald-700 hover:bg-emerald-50"
-        ></Button>
+          aria-label="copy to clipboard"
+        >
+          {copied ? (
+            <Check className="h-5 w-5" />
+          ) : (
+            <Copy className="h-5 w-5" />
+          )}
+        </Button>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
