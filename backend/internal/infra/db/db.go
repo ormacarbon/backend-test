@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -14,14 +13,8 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		getEnv("DB_HOST", "localhost"),
-		getEnv("DB_PORT", "5432"),
-		getEnv("DB_USER", "user"),
-		getEnv("DB_PASSWORD", "password"),
-		getEnv("DB_NAME", "backend"),
-	)
+
+	dsn := os.Getenv("DB_URL")
 
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
