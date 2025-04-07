@@ -1,0 +1,8 @@
+linters:
+  enable:
+    - all
+
+run:
+  skip-files:
+    - "_test\\.go$"
+    - "mock_service\\.go$"
