@@ -1,0 +1,23 @@
+{
+  "name": "backend-test",
+  "version": "1.0.0",
+  "description": "A ideia é construir uma página de competição muito simples que incentiva as pessoas a divulgarem notícias sobre compensações de carbono. Os usuários chegam à página e preenchem um formulário de inscrição. Após uma inscrição bem-sucedida, eles ganham um ponto para a competição. Neste momento, eles têm a opção de compartilhar o link de inscrição. Cada inscrição bem-sucedida feita através do link compartilhado dará pontos extras para o autor original do link. Não há limite para o número de pontos que uma pessoa pode obter. No final da competição, as 10 pessoas com mais pontos vencem.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "hooks": "^0.3.2",
+    "husky": "^9.1.7"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
