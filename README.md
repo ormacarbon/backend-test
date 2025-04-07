@@ -122,7 +122,7 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir:
 
 ## 📬 Contato
 
-Feito com 💙 por [Seu Nome].
+Feito com 💙 por Cássius Queiroz Bessa.
 
 Se tiver dúvidas ou quiser trocar ideias, abra uma issue ou entre em contato!
 
