@@ -59,5 +59,7 @@ func main() {
 	v1.GET("/find/posts", internal.FindPostHttp(findallPosts))
 	v1.GET("/finish", internal.EndCompetitionHttp(endCompetition))
 
-	router.Run(config.ServerAddress)
+	if err := router.Run(config.ServerAddress); err != nil {
+		log.Fatal("cannot start server:", err)
+	}
 }

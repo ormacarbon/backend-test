@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"log"
 )
 
 type IncreasePoint struct {
@@ -23,23 +22,18 @@ func (i *IncreasePoint) Execute(ctx context.Context, input InputIncreasePoint) e
 		return err
 	}
 	points := author.Points + 1
-
 	err = i.repo.IncreasePoint(ctx, author.Email, points)
 	if err != nil {
 		return err
 	}
-
-	go func() {
-		err = i.smtp.Send(InputSendEmail{
-			To:      author.Email,
-			Subject: "Parabéns!",
-			Body:    "Você recebeu um ponto em nosso sorteio!",
-		})
-		if err != nil {
-			log.Printf("error sending email: %v", err)
-			return
-		}
-	}()
+	err = i.smtp.Send(InputSendEmail{
+		To:      author.Email,
+		Subject: "Parabéns!",
+		Body:    "Você recebeu um ponto em nosso sorteio!",
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

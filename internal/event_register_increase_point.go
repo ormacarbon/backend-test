@@ -20,9 +20,7 @@ func RegisterIncreasePointHandler(eventBus *EventBus, usecase *IncreasePoint) {
 				continue
 			}
 
-			_ = usecase.Execute(context.Background(), InputIncreasePoint{
-				Referal: data.Referal,
-			})
+			_ = usecase.Execute(context.Background(), InputIncreasePoint(data))
 		}
 	}()
 }

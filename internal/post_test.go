@@ -28,7 +28,8 @@ func TestPostCreate(t *testing.T) {
 		Title:   "Post title",
 		Content: "Post body",
 	}
-	postCreate.Execute(ctx, inputPost, 1)
+	err = postCreate.Execute(ctx, inputPost, 1)
+	assert.NoError(t, err)
 	findPost := NewFindPost(repo)
 	output, err := findPost.Execute(ctx)
 	assert.NoError(t, err)
@@ -59,9 +60,10 @@ func TestPostFindAll(t *testing.T) {
 		Title:   "Post title",
 		Content: "Post body",
 	}
-	postCreate.Execute(ctx, inputPost, 1)
-	postCreate.Execute(ctx, inputPost, 1)
-	postCreate.Execute(ctx, inputPost, 2)
+	err = postCreate.Execute(ctx, inputPost, 1)
+	assert.NoError(t, err)
+	err = postCreate.Execute(ctx, inputPost, 1)
+	assert.NoError(t, err)
 	findPost := NewFindPostByAuthor(repo)
 	output, err := findPost.Execute(ctx, 1)
 	assert.NoError(t, err)

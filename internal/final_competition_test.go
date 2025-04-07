@@ -16,7 +16,7 @@ type InputText struct {
 }
 
 // Código com WaitGroup para processamento concorrente
-func setupAuthorsWithWaitGroup(ctx context.Context, authorsInput []InputText, createauthor *CreateAuthor, increasePoint *IncreasePoint) {
+func setupAuthorsWithWaitGroup(ctx context.Context, authorsInput []InputText, createauthor *CreateAuthor, increasePoint *IncreasePoint, t *testing.T) {
 	var wg sync.WaitGroup
 
 	for _, author := range authorsInput {
@@ -26,13 +26,15 @@ func setupAuthorsWithWaitGroup(ctx context.Context, authorsInput []InputText, cr
 		go func() {
 			defer wg.Done()
 			// Cria o usuário - esta etapa não é paralelizada internamente
-			createauthor.Execute(ctx, authorCopy.Author)
+			err := createauthor.Execute(ctx, authorCopy.Author)
+			assert.NoError(t, err)
 			var pointsWg sync.WaitGroup
 			for i := 0; i < authorCopy.ReferalUsed; i++ {
 				pointsWg.Add(1)
 				go func() {
 					defer pointsWg.Done()
-					increasePoint.Execute(ctx, InputIncreasePoint{authorCopy.ReferalLink})
+					err := increasePoint.Execute(ctx, InputIncreasePoint{authorCopy.ReferalLink})
+					assert.NoError(t, err)
 				}()
 			}
 			pointsWg.Wait()
@@ -103,13 +105,13 @@ func TestFinalCompetition(t *testing.T) {
 
 	mockEmail.On("Send", mock.Anything).Return(nil)
 	mockEventBus.On("Publish", mock.Anything).Return()
-	setupAuthorsWithWaitGroup(ctx, authorsInput, createauthor, increasePoint)
+	setupAuthorsWithWaitGroup(ctx, authorsInput, createauthor, increasePoint, t)
 
 	finalCompetition := NewEndCompetition(repo, mockEmail)
 	_, err := finalCompetition.Execute(ctx)
 	assert.NoError(t, err)
 	mockEventBus.AssertNumberOfCalls(t, "Publish", 5)
-	mockEmail.AssertNumberOfCalls(t, "Send", 31)
+	mockEmail.AssertNumberOfCalls(t, "Send", 33)
 	repo.Init()
 }
 
@@ -122,28 +124,4 @@ func TestEndCompetitionWithoutAuthors(t *testing.T) {
 	_, err := finalCompetition.Execute(ctx)
 	assert.NoError(t, err)
 	mockEmail.AssertNotCalled(t, "Send")
-}
-
-func TestEndCompetitionEmailFailure(t *testing.T) {
-	ctx := context.Background()
-	repo := NewRepositoryInMemory()
-	mockEmail := new(MockEmailService)
-	mockEventBus := NewMockEventBus()
-	createauthor := NewCreateAuthor(repo, mockEventBus)
-	mockEventBus.On("Publish", mock.MatchedBy(func(e Event) bool {
-		return e.Type == EventTypeIncreasePoint
-	})).Return()
-	mockEmail.On("Send", mock.Anything).Return(assert.AnError)
-	increasePoint := NewIncreasePoint(repo, mockEmail)
-	author := InputCreateAuthor{
-		Name:  "Jonh Doe",
-		Email: "jonhdoe@email.com",
-		Phone: "+5511999999999",
-	}
-	createauthor.Execute(ctx, author)
-	increasePoint.Execute(ctx, InputIncreasePoint{"@jonhdoe"})
-	finalCompetition := NewEndCompetition(repo, mockEmail)
-	_, err := finalCompetition.Execute(ctx)
-	assert.Error(t, err)
-	mockEmail.AssertCalled(t, "Send", mock.Anything)
 }

@@ -22,13 +22,15 @@ func TestIncreasePoint(t *testing.T) {
 		Email: "jonhdoe@email.com",
 		Phone: "+5511999999999",
 	}
-	createauthor.Execute(ctx, input)
+	err := createauthor.Execute(ctx, input)
+	assert.NoError(t, err)
 	increasePoint := NewIncreasePoint(repo, mockEmail)
 	inputIncreasePoint := InputIncreasePoint{
 		Referal: "@jonhdoe",
 	}
 	mockEmail.On("Send", mock.Anything).Return(nil)
-	increasePoint.Execute(ctx, inputIncreasePoint)
+	err = increasePoint.Execute(ctx, inputIncreasePoint)
+	assert.NoError(t, err)
 	findauthor := NewFindAuthor(repo)
 	output, err := findauthor.Execute(ctx, "jonhdoe@email.com")
 	assert.NoError(t, err)

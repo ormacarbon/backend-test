@@ -14,9 +14,9 @@ const (
 )
 
 var (
-	InvalidName  = errors.New("invalid name")
-	InvalidEmail = errors.New("invalid email")
-	InvalidPhone = errors.New("invalid phone")
+	ErrInvalidName  = errors.New("invalid name")
+	ErrInvalidEmail = errors.New("invalid email")
+	ErrInvalidPhone = errors.New("invalid phone")
 )
 
 type Author struct {
@@ -38,13 +38,13 @@ func NewAuthor(name, email, phone string) (*Author, error) {
 		ReferralCode: strings.ToLower(fmt.Sprintf("@%s", strings.ReplaceAll(name, " ", ""))),
 	}
 	if author.validateName() {
-		return nil, InvalidName
+		return nil, ErrInvalidName
 	}
 	if !author.validateEmail() {
-		return nil, InvalidEmail
+		return nil, ErrInvalidEmail
 	}
 	if !author.validatePhone() {
-		return nil, InvalidPhone
+		return nil, ErrInvalidPhone
 	}
 	return &author, nil
 }

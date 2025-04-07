@@ -23,7 +23,8 @@ func TestCreateAuthor(t *testing.T) {
 		Email: "jonhdoe@email.com",
 		Phone: "+5511999999999",
 	}
-	createauthor.Execute(ctx, input)
+	err := createauthor.Execute(ctx, input)
+	assert.NoError(t, err)
 	findauthor := NewFindAuthor(repo)
 	output, err := findauthor.Execute(ctx, input.Email)
 	assert.NoError(t, err)
