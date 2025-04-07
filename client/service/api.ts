@@ -36,7 +36,9 @@ class Client {
 	async getLeaderboard(params?: { sort?: string; page?: string; search?: string }): Promise<Response<User[]>> {
 		const query = new URLSearchParams(params).toString();
 		const end = query ? `/api/leaderboard?${query}` : '/api/leaderboard';
-		return this.get<User[]>(end);
+		return this.get<User[]>(end, {
+			method: 'GET',
+		});
 	}
 }
 

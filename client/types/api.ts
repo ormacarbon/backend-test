@@ -21,4 +21,8 @@ export interface Response<T> {
 	message?: string;
 	error?: string;
 	data?: T;
+	leaderboard?: T;
+	total: number;
+	page: number;
+	totalPages: number;
 }
