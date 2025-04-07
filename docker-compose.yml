@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: carbon_offsets_api
+    build:
+      context: .
+    volumes:
+      - .:/app
+    depends_on:
+      - database
+    networks:
+      - carbon_offsets_network
+    ports:
+      - 8000:8000
+  database:
+    container_name: carbon_offsets_db
+    image: postgres
+    restart: always
+    hostname: db
+    networks:
+      - carbon_offsets_network
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  db-data:
+
+networks:
+  carbon_offsets_network:
+    driver: bridge
