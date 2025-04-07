@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: rgb(252, 252, 252);
+  --foreground: rgb(48, 43, 41);
+  --accent: rgb(176, 122, 10);
+  --accent-hover: rgb(140, 98, 8);
+  --muted: rgb(245, 245, 245);
+  --border: rgb(229, 229, 229);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
