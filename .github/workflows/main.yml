@@ -53,6 +53,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     
     steps:
     - uses: actions/checkout@v3
@@ -66,9 +67,9 @@ jobs:
     - name: Build
       run: |
         mkdir -p bin
-        GOOS=linux GOARCH=amd64 go build -v -o bin/app-linux-amd64 ./cmd/main
-        GOOS=darwin GOARCH=amd64 go build -v -o bin/app-darwin-amd64 ./cmd/main
-        GOOS=windows GOARCH=amd64 go build -v -o bin/app-windows-amd64.exe ./cmd/main
+        GOOS=linux GOARCH=amd64 go build -v -o bin/app-linux-amd64 ./cmd/master
+        GOOS=darwin GOARCH=amd64 go build -v -o bin/app-darwin-amd64 ./cmd/master
+        GOOS=windows GOARCH=amd64 go build -v -o bin/app-windows-amd64.exe ./cmd/master
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
@@ -81,7 +82,7 @@ jobs:
     name: Tag
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     
     steps:
     - uses: actions/checkout@v3
