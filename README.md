@@ -1,6 +1,6 @@
 # 🛠️ Bvio Mono
 
-Monorepo da aplicação **Bvio**, uma plataforma de educação gamificada com foco em competições, rankings e recompensas via sistema de indicações.
+Monorepo da aplicação **Bvio**, uma plataforma com foco em competições, rankings e recompensas via sistema de indicações.
 
 Este repositório contém tanto o **backend** (Go) quanto o **frontend** (Next.js), com orquestração via Docker e arquitetura orientada por **DDD (Domain-Driven Design)** no backend.
 
@@ -22,7 +22,7 @@ Este repositório contém tanto o **backend** (Go) quanto o **frontend** (Next.j
 
 A arquitetura segue os princípios de Domain-Driven Design:
 
-- **Domain Layer**: contém entidades, regras de negócio e interfaces dos repositórios
+- **Domain Layer**: contém entidades e encapsulamento das regras das mesmas
 - **Application Layer**: orquestra os casos de uso
 - **Infrastructure Layer**: implementações concretas de repositórios (DB, e-mail)
 - **Interface Layer**: entrega da aplicação (ex: HTTP handlers com Gin)
