@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"math"
 	"net/http"
 	"server/internal/controllers"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,7 +44,16 @@ func (h *UserHandler) Register(c *gin.Context) {
 }
 
 func (h *UserHandler) GetLeaderboard(c *gin.Context) {
-	users, err := h.userController.GetLeaderboard()
+	sort := c.DefaultQuery("sort", "points")
+	search := c.DefaultQuery("search", "")
+	page := 1
+	if pageStr := c.Query("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil {
+			page = p
+		}
+	}
+
+	users, total, err := h.userController.GetLeaderboard(sort, search, page)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve leaderboard"})
 		return
@@ -50,5 +61,8 @@ func (h *UserHandler) GetLeaderboard(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"leaderboard": users,
+		"total":       total,
+		"page":        page,
+		"totalPages":  int(math.Ceil(float64(total) / 10.0)),
 	})
 }

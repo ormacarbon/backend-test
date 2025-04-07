@@ -50,6 +50,12 @@ func (c *UserController) RegisterUser(name, email, phone, referralCode string) (
 	return user, nil
 }
 
-func (c *UserController) GetLeaderboard() ([]models.User, error) {
-	return c.userRepo.GetTopUsers(10)
+func (c *UserController) GetLeaderboard(sort string, search string, page int) ([]models.User, int64, error) {
+	filters := repository.Filters{
+		Sort:   sort,
+		Search: search,
+		Page:   page,
+		Limit:  10,
+	}
+	return c.userRepo.GetLeaderboard(filters)
 }

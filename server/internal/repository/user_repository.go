@@ -10,7 +10,14 @@ type UserRepository interface {
 	Create(user *models.User) error
 	FindByShareCode(shareCode string) (*models.User, error)
 	UpdatePoints(user *models.User, points int) error
-	GetTopUsers(limit int) ([]models.User, error)
+	GetLeaderboard(filters Filters) ([]models.User, int64, error)
+}
+
+type Filters struct {
+	Sort   string
+	Search string
+	Page   int
+	Limit  int
 }
 
 type userRepository struct {
@@ -37,8 +44,29 @@ func (r *userRepository) UpdatePoints(user *models.User, points int) error {
 	return r.db.Model(user).Update("points", points).Error
 }
 
-func (r *userRepository) GetTopUsers(limit int) ([]models.User, error) {
+func (r *userRepository) GetLeaderboard(filters Filters) ([]models.User, int64, error) {
 	var users []models.User
-	err := r.db.Order("points desc").Limit(limit).Select("name, points").Find(&users).Error
-	return users, err
+	var total int64
+
+	query := r.db.Model(&models.User{})
+
+	if filters.Search != "" {
+		query = query.Where("name ILIKE ? OR email ILIKE ?", "%"+filters.Search+"%", "%"+filters.Search+"%")
+	}
+
+	query.Count(&total)
+
+	switch filters.Sort {
+	case "name":
+		query = query.Order("name asc")
+	case "email":
+		query = query.Order("email asc")
+	default:
+		query = query.Order("points desc")
+	}
+
+	offset := (filters.Page - 1) * filters.Limit
+	err := query.Offset(offset).Limit(filters.Limit).Find(&users).Error
+
+	return users, total, err
 }
