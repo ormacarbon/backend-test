@@ -5,7 +5,8 @@ migrate:
 	docker exec -i carbon_offsets_db psql -d carbon_offsets -U docker -f /schema.sql
 
 test:
-	go test -v ./...
+	go env -w CGO_ENABLED=1
+	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 test-coverage:
 	go test -coverprofile=coverage.out ./...

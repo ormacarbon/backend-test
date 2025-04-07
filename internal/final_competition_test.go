@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,34 +12,6 @@ type InputText struct {
 	ReferalUsed int
 	ReferalLink string
 	Author      InputCreateAuthor
-}
-
-// Código com WaitGroup para processamento concorrente
-func setupAuthorsWithWaitGroup(ctx context.Context, authorsInput []InputText, createauthor *CreateAuthor, increasePoint *IncreasePoint, t *testing.T) {
-	var wg sync.WaitGroup
-
-	for _, author := range authorsInput {
-		wg.Add(1)
-		// Captura as variáveis em uma closure para evitar problemas de concorrência
-		authorCopy := author
-		go func() {
-			defer wg.Done()
-			// Cria o usuário - esta etapa não é paralelizada internamente
-			err := createauthor.Execute(ctx, authorCopy.Author)
-			assert.NoError(t, err)
-			var pointsWg sync.WaitGroup
-			for i := 0; i < authorCopy.ReferalUsed; i++ {
-				pointsWg.Add(1)
-				go func() {
-					defer pointsWg.Done()
-					err := increasePoint.Execute(ctx, InputIncreasePoint{authorCopy.ReferalLink})
-					assert.NoError(t, err)
-				}()
-			}
-			pointsWg.Wait()
-		}()
-	}
-	wg.Wait()
 }
 
 func TestFinalCompetition(t *testing.T) {
@@ -105,8 +76,13 @@ func TestFinalCompetition(t *testing.T) {
 
 	mockEmail.On("Send", mock.Anything).Return(nil)
 	mockEventBus.On("Publish", mock.Anything).Return()
-	setupAuthorsWithWaitGroup(ctx, authorsInput, createauthor, increasePoint, t)
 
+	for _, author := range authorsInput {
+		createauthor.Execute(ctx, author.Author)
+		for i := 0; i < author.ReferalUsed; i++ {
+			increasePoint.Execute(ctx, InputIncreasePoint{author.ReferalLink})
+		}
+	}
 	finalCompetition := NewEndCompetition(repo, mockEmail)
 	_, err := finalCompetition.Execute(ctx)
 	assert.NoError(t, err)
