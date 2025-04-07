@@ -1,8 +1,6 @@
+version: "2"
 linters:
-  enable:
-    - all
-
-run:
-  skip-files:
+  exclusions:
+    paths:
     - "_test\\.go$"
     - "mock_service\\.go$"
