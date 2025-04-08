@@ -19,6 +19,7 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) 
 	if err != nil {
 		logger.Fatalw("Failed to connect database", "error", err)
 	}
+
 	logger.Info("Database connection established")
 
 	if err := migration.Migrate(db, logger); err != nil {
@@ -29,9 +30,9 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) 
 	userRepo := repository.NewUserRepository(db, logger)
 
 	// --- Services ---
-	emailSvc := email.NewEmailService(logger)
+	emailSvc := email.NewEmailService(cfg, logger)
 	userService := service.NewUserService(userRepo, emailSvc, logger)
-	competitionService := service.NewCompetitionService(userRepo, emailSvc)
+	competitionService := service.NewCompetitionService(userRepo, emailSvc, logger)
 	leaderboardService := service.NewLeaderboardService(userRepo, logger)
 
 	// --- Handlers ---
@@ -39,6 +40,7 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) 
 	userHandler := handler.NewUserHandler(userService, logger)
 	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService, logger)
 	competitionHandler := handler.NewCompetitionHandler(competitionService, logger)
+	referralHandler := handler.NewReferralsHandler(userService, logger)
 
 	app.Use(middleware.SetupCors())
 
@@ -54,11 +56,13 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) 
 	api.Get("/user/:id", userHandler.GetUserByID)
 	api.Get("/user/referral/:token", userHandler.GetUserByReferralToken)
 	api.Post("/user/register", userHandler.RegisterUser)
-	api.Post("/user	/register/referral", userHandler.RegisterUserWithReferral)
 
 	// Leaderboard
 	api.Get("/leaderboard", leaderboardHandler.GetLeaderboard)
 
 	// Competition
 	api.Post("/competition/finish", competitionHandler.FinishCompetition)
+
+	// Referrals
+	api.Get("/referrals", referralHandler.GetReferrals)
 }

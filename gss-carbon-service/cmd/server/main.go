@@ -11,11 +11,16 @@ import (
 )
 
 func main() {
-	logger, err := zap.NewDevelopment()
+	logger, err := zap.NewProduction()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
 	}
-	defer logger.Sync()
+	defer func(logger *zap.Logger) {
+		err := logger.Sync()
+		if err != nil {
+			log.Fatalf("can't sync zap logger: %v", err)
+		}
+	}(logger)
 
 	sugar := logger.Sugar()
 

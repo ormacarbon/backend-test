@@ -1,35 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { ArrowLeft, Trophy, Medal, Award } from "lucide-react";
-
-interface User {
-  id: string;
-  name: string;
-  points: number;
-}
+import { useLeaderboard } from "@/hooks/useLeaderboard";
 
 const LeaderboardPage: React.FC = () => {
-  const [leaderboard, setLeaderboard] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getLeaderboard();
-        setLeaderboard(data);
-      } catch (error) {
-        console.error("Erro ao carregar leaderboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <div>Carregando...</div>;
-  }
+  const { data: leaderboardData, isLoading } = useLeaderboard();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -42,7 +18,7 @@ const LeaderboardPage: React.FC = () => {
           Back to home
         </Link>
 
-        <div className=" mt-8 rounded-2xl bg-white shadow-xl">
+        <div className="mt-8 rounded-2xl bg-white shadow-xl">
           <div className="relative bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-12 text-center text-white">
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 transform">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-500 shadow-lg">
@@ -56,24 +32,22 @@ const LeaderboardPage: React.FC = () => {
           </div>
 
           <div className="px-6 py-8">
-            {leaderboard.length > 0 ? (
+            {isLoading ? (
+              <div className="text-center">
+                <p className="text-lg text-slate-600">Loading leaderboard...</p>
+              </div>
+            ) : leaderboardData && leaderboardData.length > 0 ? (
               <div className="overflow-hidden rounded-lg border border-slate-200">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-slate-50">
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">
-                        Rank
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">
-                        Name
-                      </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-slate-700">
-                        Points
-                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Rank</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-slate-700">Points</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {leaderboard.map((user, index) => (
+                    {leaderboardData.map((user, index) => (
                       <tr
                         key={user.id}
                         className={index < 10 ? "bg-emerald-50/30" : ""}
@@ -103,13 +77,11 @@ const LeaderboardPage: React.FC = () => {
                                   {index === 0
                                     ? "First place"
                                     : index === 1
-                                      ? "Second place"
-                                      : "Third place"}
+                                    ? "Second place"
+                                    : "Third place"}
                                 </span>
                               ) : (
-                                <span className="sr-only">
-                                  Rank {index + 1}
-                                </span>
+                                <span className="sr-only">Rank {index + 1}</span>
                               )}
                             </span>
                           </div>

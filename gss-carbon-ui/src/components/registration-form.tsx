@@ -13,12 +13,10 @@ import {
 } from "../schemas/registerUserSchema";
 
 interface RegistrationFormProps {
-  referralCode: string | null;
+  referralToken: string | null;
 }
 
-const RegistrationForm: React.FC<RegistrationFormProps> = ({
-  referralCode,
-}) => {
+const RegistrationForm: React.FC<RegistrationFormProps> = ({ referralToken }) => {
   const { mutateAsync, isPending } = useRegisterUser();
   const navigate = useNavigate();
   const {
@@ -31,10 +29,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
 
   const onSubmit = async (data: SignUpSchemaType) => {
     try {
-      const response = await mutateAsync({ ...data, referralCode });
-      if (response.status === 201) {
+      const response = await mutateAsync({ ...data, referralToken });
+      if (response.status === 201)
         navigate(`/success/${response.data.referralToken}`);
-      }
     } catch (error) {
       console.error("Registration error:", error);
     }

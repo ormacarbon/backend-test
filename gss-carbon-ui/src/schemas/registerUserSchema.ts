@@ -9,7 +9,7 @@ export const registerUserSchema = yup
       .required("Phone number is required")
       .matches(
         /^\d{11}$/,
-        "Phone number format is invalid. Ex: +5547999999999",
+        "Phone number format is invalid. Ex: 47999999999",
       ),
   })
   .required();

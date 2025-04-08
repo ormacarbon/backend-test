@@ -24,13 +24,10 @@ func NewLeaderboardService(userRepo repository.UserRepository, logger *zap.Sugar
 }
 
 func (s *LeaderboardServiceImpl) GetLeaderboard(ctx context.Context, limit int) ([]model.User, error) {
-	s.logger.Infow("Getting leaderboard", "limit", limit)
-
 	users, err := s.userRepo.GetTopUsers(ctx, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	s.logger.Infow("Leaderboard retrieved successfully", "limit", limit, "count", len(users))
 	return users, nil
 }

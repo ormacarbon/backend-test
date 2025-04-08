@@ -47,7 +47,7 @@ const Register: React.FC = () => {
               </div>
             )}
 
-            <RegistrationForm referralCode={referralToken} />
+            <RegistrationForm referralToken={referralToken} />
           </div>
         </div>
       </div>
