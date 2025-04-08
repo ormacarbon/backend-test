@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"server/internal/controllers"
 	"strconv"
 
@@ -64,5 +66,24 @@ func (h *UserHandler) GetLeaderboard(c *gin.Context) {
 		"total":       total,
 		"page":        page,
 		"totalPages":  int(math.Ceil(float64(total) / 10.0)),
+	})
+}
+
+func (h *UserHandler) GetShareLink(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
+		return
+	}
+
+	user, err := h.userController.GetUserByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Invalid id"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user":      user,
+		"share_url": fmt.Sprintf("%s/register?ref=%s", os.Getenv("FRONTEND_URL"), user.ShareCode),
 	})
 }

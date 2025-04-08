@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"server/internal/models"
 	"server/internal/repository"
 	"server/utils"
+
+	"github.com/google/uuid"
 )
 
 type UserController struct {
@@ -36,9 +36,7 @@ func (c *UserController) RegisterUser(name, email, phone, referralCode string) (
 		}
 	}
 
-	shareCode := make([]byte, 6)
-	rand.Read(shareCode)
-	user.ShareCode = hex.EncodeToString(shareCode)
+	user.ShareCode = uuid.New().String()
 
 	if err := c.userRepo.Create(user); err != nil {
 		return nil, err
@@ -58,4 +56,12 @@ func (c *UserController) GetLeaderboard(sort string, search string, page int) ([
 		Limit:  10,
 	}
 	return c.userRepo.GetLeaderboard(filters)
+}
+
+func (c *UserController) GetUserByID(id uint) (*models.User, error) {
+	user, err := c.userRepo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

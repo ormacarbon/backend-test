@@ -14,5 +14,6 @@ func SetupRoutes(r *gin.Engine, userHandler *handlers.UserHandler) {
 	{
 		api.POST("/register", userHandler.Register)
 		api.GET("/leaderboard", userHandler.GetLeaderboard)
+		api.GET("/share/:id", userHandler.GetShareLink)
 	}
 }
