@@ -24,6 +24,8 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 
+COPY --from=builder /app/internal/email/templates /app/internal/email/templates
+
 RUN chown -R appuser:appgroup /app
 
 USER appuser

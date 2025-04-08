@@ -146,7 +146,7 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, user *dto.RegisterUs
 			s.logger.Infow("Awarded point to referrer", "referrerID", referrer.ID, "referredUserID", newUser.ID)
 
 			subject := "You've received an extra point!"
-			templatePath := "internal/email/referral_bonus.html"
+			templatePath := "internal/email/templates/referral_bonus.html"
 			emailData := struct {
 				Name   string
 				Points int

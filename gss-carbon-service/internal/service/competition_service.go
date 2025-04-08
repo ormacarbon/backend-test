@@ -34,7 +34,7 @@ func (s *competitionService) FinishCompetition(ctx context.Context, limit int) (
 	}
 
 	subject := "Congratulations, you're a winner!"
-	templatePath := "internal/email/winner_notification.html"
+	templatePath := "internal/email/templates/winner_notification.html"
 
 	var wg sync.WaitGroup
 	for _, winner := range winners {
