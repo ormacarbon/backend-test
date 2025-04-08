@@ -1,15 +1,21 @@
-package internal
+package http
 
 import (
 	"net/http"
 	"strconv"
 
+	"github.com/Andreffelipe/carbon_offsets_api/internal/application/usecase"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/logger"
 	"github.com/gin-gonic/gin"
 )
 
-func CreateAuthorHttp(usecase *CreateAuthor, log *Logger) gin.HandlerFunc {
+func CreateAuthorHttp(usecase *usecase.CreateAuthor, log *logger.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var author InputCreateAuthor
+		var author struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+			Phone string `json:"phone"`
+		}
 		ctx := c.Request.Context()
 		err := c.Bind(&author)
 		if err != nil {
@@ -30,9 +36,13 @@ func CreateAuthorHttp(usecase *CreateAuthor, log *Logger) gin.HandlerFunc {
 	}
 }
 
-func CreatePostHttp(usecase *PostCreate, log *Logger) gin.HandlerFunc {
+func CreatePostHttp(usecase *usecase.PostCreate, log *logger.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var post InputPostCreate
+		var post struct {
+			Title   string `json:"title"`
+			Content string `json:"content"`
+		}
+
 		var ctx = c.Request.Context()
 		err := c.Bind(&post)
 		if err != nil {
@@ -59,7 +69,7 @@ func CreatePostHttp(usecase *PostCreate, log *Logger) gin.HandlerFunc {
 	}
 }
 
-func FindPostByAuthorHttp(usecase *FindPostByAuthor) gin.HandlerFunc {
+func FindPostByAuthorHttp(usecase *usecase.FindPostByAuthor) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx = c.Request.Context()
 		authorID := c.Param("author_id")
@@ -77,7 +87,7 @@ func FindPostByAuthorHttp(usecase *FindPostByAuthor) gin.HandlerFunc {
 	}
 }
 
-func FindPostHttp(usecase *FindPost) gin.HandlerFunc {
+func FindPostHttp(usecase *usecase.FindPost) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx = c.Request.Context()
 		output, err := usecase.Execute(ctx)
@@ -89,7 +99,7 @@ func FindPostHttp(usecase *FindPost) gin.HandlerFunc {
 	}
 }
 
-func EndCompetitionHttp(usecase *EndCompetition) gin.HandlerFunc {
+func EndCompetitionHttp(usecase *usecase.EndCompetition) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 		winners, err := usecase.Execute(ctx)
@@ -101,7 +111,7 @@ func EndCompetitionHttp(usecase *EndCompetition) gin.HandlerFunc {
 	}
 }
 
-func FindPostByIDHttp(usecase *FindPostByID) gin.HandlerFunc {
+func FindPostByIDHttp(usecase *usecase.FindPostByID) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx = c.Request.Context()
 		postID := c.Param("post_id")

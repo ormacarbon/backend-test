@@ -1,15 +1,17 @@
-package internal
+package usecase
 
 import (
 	"context"
 	"time"
+
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/database"
 )
 
 type FindPost struct {
-	repo Repository
+	repo database.Repository
 }
 
-func NewFindPost(repo Repository) *FindPost {
+func NewFindPost(repo database.Repository) *FindPost {
 	return &FindPost{repo: repo}
 }
 

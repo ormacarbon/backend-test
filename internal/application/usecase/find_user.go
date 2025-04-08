@@ -1,12 +1,16 @@
-package internal
+package usecase
 
-import "context"
+import (
+	"context"
+
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/database"
+)
 
 type FindAuthor struct {
-	repo Repository
+	repo database.Repository
 }
 
-func NewFindAuthor(repo Repository) *FindAuthor {
+func NewFindAuthor(repo database.Repository) *FindAuthor {
 	return &FindAuthor{repo: repo}
 }
 

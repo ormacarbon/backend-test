@@ -1,17 +1,22 @@
-package internal
+package usecase
 
-import "context"
+import (
+	"context"
+
+	"github.com/Andreffelipe/carbon_offsets_api/internal/domain"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/database"
+)
 
 type PostCreate struct {
-	repo Repository
+	repo database.Repository
 }
 
-func NewPostCreate(repo Repository) *PostCreate {
+func NewPostCreate(repo database.Repository) *PostCreate {
 	return &PostCreate{repo: repo}
 }
 
 func (p *PostCreate) Execute(ctx context.Context, input InputPostCreate, authorID int) error {
-	post := &Post{
+	post := &domain.Post{
 		Title:    input.Title,
 		Content:  input.Content,
 		AuthorID: authorID,

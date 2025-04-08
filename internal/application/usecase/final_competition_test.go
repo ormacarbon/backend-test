@@ -1,9 +1,12 @@
-package internal
+package usecase_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/Andreffelipe/carbon_offsets_api/internal/application/usecase"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/eventbus"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/repository/inmemory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -11,26 +14,26 @@ import (
 type InputText struct {
 	ReferalUsed int
 	ReferalLink string
-	Author      InputCreateAuthor
+	Author      usecase.InputCreateAuthor
 }
 
 func TestFinalCompetition(t *testing.T) {
 	ctx := context.Background()
-	repo := NewRepositoryInMemory()
-	mockEmail := new(MockEmailService)
-	mockEventBus := NewMockEventBus()
-	createauthor := NewCreateAuthor(repo, mockEventBus)
-	increasePoint := NewIncreasePoint(repo, mockEmail)
+	repo := inmemory.NewRepositoryInMemory()
+	mockEmail := new(usecase.MockEmailService)
+	mockEventBus := usecase.NewMockEventBus()
+	createauthor := usecase.NewCreateAuthor(repo, mockEventBus)
+	increasePoint := usecase.NewIncreasePoint(repo, mockEmail)
 
-	mockEventBus.On("Publish", mock.MatchedBy(func(e Event) bool {
-		return e.Type == EventTypeIncreasePoint
+	mockEventBus.On("Publish", mock.MatchedBy(func(e eventbus.Event) bool {
+		return e.Type == eventbus.EventTypeIncreasePoint
 	})).Return()
 
 	authorsInput := []InputText{
 		{
 			ReferalUsed: 10,
 			ReferalLink: "@jonhdoe",
-			Author: InputCreateAuthor{
+			Author: usecase.InputCreateAuthor{
 				Name:  "Jonh Doe",
 				Email: "jonhdoe@email.com",
 				Phone: "+5511999999999",
@@ -39,7 +42,7 @@ func TestFinalCompetition(t *testing.T) {
 		{
 			ReferalUsed: 8,
 			ReferalLink: "@jonhdoe2",
-			Author: InputCreateAuthor{
+			Author: usecase.InputCreateAuthor{
 				Name:  "Jonh Doe2",
 				Email: "jonhdoe2@email.com",
 				Phone: "+5511999999999",
@@ -48,7 +51,7 @@ func TestFinalCompetition(t *testing.T) {
 		{
 			ReferalUsed: 1,
 			ReferalLink: "@jonhdoe3",
-			Author: InputCreateAuthor{
+			Author: usecase.InputCreateAuthor{
 				Name:  "Jonh Doe3",
 				Email: "jonhdoe3@email.com",
 				Phone: "+5511999999999",
@@ -57,7 +60,7 @@ func TestFinalCompetition(t *testing.T) {
 		{
 			ReferalUsed: 3,
 			ReferalLink: "@jonhdoe4",
-			Author: InputCreateAuthor{
+			Author: usecase.InputCreateAuthor{
 				Name:  "Jonh Doe4",
 				Email: "jonhdoe4@email.com",
 				Phone: "+5511999999999",
@@ -66,7 +69,7 @@ func TestFinalCompetition(t *testing.T) {
 		{
 			ReferalUsed: 6,
 			ReferalLink: "@jonhdoe5",
-			Author: InputCreateAuthor{
+			Author: usecase.InputCreateAuthor{
 				Name:  "Jonh Doe5",
 				Email: "jonhdoe5@email.com",
 				Phone: "+5511999999999",
@@ -80,10 +83,10 @@ func TestFinalCompetition(t *testing.T) {
 	for _, author := range authorsInput {
 		createauthor.Execute(ctx, author.Author)
 		for i := 0; i < author.ReferalUsed; i++ {
-			increasePoint.Execute(ctx, InputIncreasePoint{author.ReferalLink})
+			increasePoint.Execute(ctx, usecase.InputIncreasePoint{author.ReferalLink})
 		}
 	}
-	finalCompetition := NewEndCompetition(repo, mockEmail)
+	finalCompetition := usecase.NewEndCompetition(repo, mockEmail)
 	_, err := finalCompetition.Execute(ctx)
 	assert.NoError(t, err)
 	mockEventBus.AssertNumberOfCalls(t, "Publish", 5)
@@ -93,10 +96,10 @@ func TestFinalCompetition(t *testing.T) {
 
 func TestEndCompetitionWithoutAuthors(t *testing.T) {
 	ctx := context.Background()
-	repo := NewRepositoryInMemory()
-	mockEmail := new(MockEmailService)
+	repo := inmemory.NewRepositoryInMemory()
+	mockEmail := new(usecase.MockEmailService)
 	mockEmail.On("Send", mock.Anything).Return(nil)
-	finalCompetition := NewEndCompetition(repo, mockEmail)
+	finalCompetition := usecase.NewEndCompetition(repo, mockEmail)
 	_, err := finalCompetition.Execute(ctx)
 	assert.NoError(t, err)
 	mockEmail.AssertNotCalled(t, "Send")

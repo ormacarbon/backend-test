@@ -1,8 +1,14 @@
-package internal
+package eventbus
 
 type EventBusInterface interface {
 	Subscribe(eventName string, subscriber chan<- Event) error
 	Publish(event Event)
+}
+
+const EventTypeIncreasePoint = "increase_point"
+
+type IncreasePointEventData struct {
+	Referal string
 }
 
 type Event struct {

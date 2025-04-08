@@ -1,15 +1,25 @@
-package internal
+package usecase
 
 import (
 	"context"
+
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/database"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/eventbus"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/smtp"
 )
 
 type IncreasePoint struct {
-	repo Repository
-	smtp SendEmail
+	repo database.Repository
+	smtp smtp.SendEmail
 }
 
-func NewIncreasePoint(repo Repository, smtp SendEmail) *IncreasePoint {
+func (i *IncreasePoint) InputIncreasePoint(data eventbus.IncreasePointEventData) InputIncreasePoint {
+	return InputIncreasePoint{
+		Referal: data.Referal,
+	}
+}
+
+func NewIncreasePoint(repo database.Repository, smtp smtp.SendEmail) *IncreasePoint {
 	return &IncreasePoint{
 		repo: repo,
 		smtp: smtp,
@@ -26,7 +36,7 @@ func (i *IncreasePoint) Execute(ctx context.Context, input InputIncreasePoint) e
 	if err != nil {
 		return err
 	}
-	err = i.smtp.Send(InputSendEmail{
+	err = i.smtp.Send(smtp.InputSendEmail{
 		To:      author.Email,
 		Subject: "Parabéns!",
 		Body:    "Você recebeu um ponto em nosso sorteio!",

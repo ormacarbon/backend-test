@@ -1,18 +1,22 @@
-package internal
+package usecase
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/Andreffelipe/carbon_offsets_api/internal/domain"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/database"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/smtp"
 )
 
 const MaxWinnersLenth = 10
 
 type EndCompetition struct {
-	repo Repository
-	smtp SendEmail
+	repo database.Repository
+	smtp smtp.SendEmail
 }
 
-func NewEndCompetition(repo Repository, smtp SendEmail) *EndCompetition {
+func NewEndCompetition(repo database.Repository, smtp smtp.SendEmail) *EndCompetition {
 	return &EndCompetition{repo: repo, smtp: smtp}
 }
 
@@ -47,7 +51,7 @@ func (f *EndCompetition) Execute(ctx context.Context) (*EndCompetitionOutput, er
 	// }
 	// wg.Wait()
 	for position, author := range authors {
-		err := f.smtp.Send(InputSendEmail{
+		err := f.smtp.Send(smtp.InputSendEmail{
 			To:      author.Email,
 			Subject: "Parabéns! Você está entre os 3 primeiros!\n",
 			Body: fmt.Sprintf("Olá %s \n", author.Name) +
@@ -69,5 +73,5 @@ func (f *EndCompetition) Execute(ctx context.Context) (*EndCompetitionOutput, er
 }
 
 type EndCompetitionOutput struct {
-	Winners []Author `json:"winners"`
+	Winners []domain.Author `json:"winners"`
 }

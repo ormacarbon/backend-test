@@ -1,31 +1,34 @@
-package internal
+package usecase_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/Andreffelipe/carbon_offsets_api/internal/application/usecase"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/eventbus"
+	"github.com/Andreffelipe/carbon_offsets_api/internal/infra/repository/inmemory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateAuthor(t *testing.T) {
 	ctx := context.Background()
-	repo := NewRepositoryInMemory()
-	mockEventBus := NewMockEventBus()
-	createauthor := NewCreateAuthor(repo, mockEventBus)
+	repo := inmemory.NewRepositoryInMemory()
+	mockEventBus := usecase.NewMockEventBus()
+	createauthor := usecase.NewCreateAuthor(repo, mockEventBus)
 
-	mockEventBus.On("Publish", mock.MatchedBy(func(e Event) bool {
-		return e.Type == EventTypeIncreasePoint
+	mockEventBus.On("Publish", mock.MatchedBy(func(e eventbus.Event) bool {
+		return e.Type == eventbus.EventTypeIncreasePoint
 	})).Return()
 
-	input := InputCreateAuthor{
+	input := usecase.InputCreateAuthor{
 		Name:  "Jonh Doe",
 		Email: "jonhdoe@email.com",
 		Phone: "+5511999999999",
 	}
 	err := createauthor.Execute(ctx, input)
 	assert.NoError(t, err)
-	findauthor := NewFindAuthor(repo)
+	findauthor := usecase.NewFindAuthor(repo)
 	output, err := findauthor.Execute(ctx, input.Email)
 	assert.NoError(t, err)
 	assert.Equal(t, input.Name, output.Name)
