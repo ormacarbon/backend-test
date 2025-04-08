@@ -30,4 +30,4 @@ jobs:
         with:
           context: ./gss-carbon-service
           push: true
-          tags: gss-carbon-service:latest
+          tags: icl00ud/gss-carbon-service:latest
