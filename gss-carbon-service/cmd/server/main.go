@@ -1,26 +1,45 @@
 package main
 
 import (
-	"github.com/icl00ud/backend-test/internal/config"
-	"github.com/icl00ud/backend-test/internal/routes"
 	"log"
 
+	"github.com/icl00ud/backend-test/internal/config"
+	"github.com/icl00ud/backend-test/internal/routes"
+
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 func main() {
-	// Loading env vars
+	logger, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("can't initialize zap logger: %v", err)
+	}
+	defer func(logger *zap.Logger) {
+		err := logger.Sync()
+		if err != nil {
+			log.Fatalf("can't sync zap logger: %v", err)
+		}
+	}(logger)
+
+	sugar := logger.Sugar()
+
+	sugar.Info("Logger initialized")
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal("Error loading config:", err)
+		sugar.Fatalw("Error loading config", "error", err)
 	}
+	sugar.Info("Configuration loaded")
 
-	// Inicializa o Fiber
 	app := fiber.New()
 
-	// Configura as rotas e dependências
-	routes.SetupRoutes(app, cfg)
+	routes.SetupRoutes(app, cfg, sugar)
 
-	// Inicia o servidor na porta definida
-	log.Fatal(app.Listen(":" + cfg.ServerPort))
+	listenAddr := ":" + cfg.ServerPort
+	sugar.Infow("Starting server", "address", listenAddr)
+
+	if err := app.Listen(listenAddr); err != nil {
+		sugar.Fatalw("Failed to start server", "error", err)
+	}
 }

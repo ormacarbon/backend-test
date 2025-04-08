@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Extra Point!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #d1fae5, #cffafe, #ecfeff);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 40px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header {
+            font-size: 26px;
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            font-size: 16px;
+            color: #1e293b;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .content p {
+            margin: 15px 0;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">Hey there! 😃</div>
+    <div class="content">
+        <p>Congratulations! <strong>{{.Name}}</strong> just signed up using your referral link.</p>
+        <p>That means you've earned an extra point! 🎉</p>
+        <p>Now you have <strong>{{.Points}}</strong> points.</p>
+    </div>
+    <div class="footer">
+        <p>Keep sharing and watch those points add up!</p>
+    </div>
+</div>
+</body>
+</html>
