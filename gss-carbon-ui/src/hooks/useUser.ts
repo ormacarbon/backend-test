@@ -1,4 +1,4 @@
-import { Referrals, User, UserRegister } from "@/interfaces/user.interface";
+import { User, UserRegister } from "@/interfaces/user.interface";
 import { queryKeys } from "@/query/queryKeys";
 import {
   getUserById,
