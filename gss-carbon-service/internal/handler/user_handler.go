@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/icl00ud/backend-test/internal/dto"
+	"github.com/icl00ud/backend-test/internal/errs"
 	"github.com/icl00ud/backend-test/internal/service"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,59 +14,68 @@ import (
 
 type UserHandler struct {
 	userService service.UserService
-	logger      *zap.Logger
+	logger      *zap.SugaredLogger
 }
 
-func NewUserHandler(userService service.UserService, logger *zap.Logger) *UserHandler {
+func NewUserHandler(userService service.UserService, logger *zap.SugaredLogger) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 		logger:      logger.Named("UserHandler"),
 	}
 }
 
-// RegisterUser register user without refferal token
-func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
-	sugar := h.logger.Sugar()
-	sugar.Info("Received request to register user")
+func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
+	h.logger.Info("Received request to get user by ID")
+	id := c.Params("id")
 
-	var user dto.RegisterUserRequest
-	if err := c.BodyParser(&user); err != nil {
-		sugar.Warnw("Failed to parse request body for user registration", "error", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
-	}
-
-	createdUser, err := h.userService.RegisterUser(context.Background(), &user)
+	user, err := h.userService.GetUserByID(context.Background(), id)
 	if err != nil {
-		sugar.Errorw("User registration service failed", "email", user.Email, "error", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to register user"})
+		h.logger.Errorw("Failed to get user by ID", "id", id, "error", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get user"})
 	}
 
-	sugar.Infow("User registration successful", "userID", createdUser.ID, "email", createdUser.Email)
-	return c.Status(fiber.StatusCreated).JSON(createdUser)
+	if user == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "user not found"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(user)
 }
 
-// RegisterUserWithReferral register user using a referral token
-func (h *UserHandler) RegisterUserWithReferral(c *fiber.Ctx) error {
-	sugar := h.logger.Sugar()
-	sugar.Info("Received request to register user with referral")
-
-	var user dto.RegisterUserWithReferralRequest
-	if err := c.BodyParser(&user); err != nil {
-		sugar.Warnw("Failed to parse request body for referral registration", "error", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
-	}
-
-	createdUser, err := h.userService.RegisterUserWithReferral(context.Background(), &user)
+func (h *UserHandler) GetUserByReferralToken(c *fiber.Ctx) error {
+	h.logger.Info("Received request to get user by referral token")
+	token := c.Params("token")
+	user, err := h.userService.GetUserByReferralToken(context.Background(), token)
 	if err != nil {
-		sugar.Errorw("User referral registration service failed", "email", user.Email, "referralToken", user.ReferralToken, "error", err)
-
-		if errors.Is(err, errors.New("invalid referral token")) {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid referral token"})
-		}
-
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to register user with referral"})
+		h.logger.Errorw("Failed to get user by referral token", "token", token, "error", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get user"})
 	}
 
-	sugar.Infow("User referral registration successful", "userID", createdUser.ID, "email", createdUser.Email)
+	if user == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "user not found"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(user)
+}
+
+func (h *UserHandler) RegisterUser(c *fiber.Ctx) error {
+	h.logger.Info("Received request to register user")
+
+	var req dto.RegisterUserRequest
+	if err := c.BodyParser(&req); err != nil {
+		h.logger.Warnw("Failed to parse request body", "error", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "invalid request body"})
+	}
+
+	createdUser, err := h.userService.RegisterUser(context.Background(), &req)
+	if err != nil {
+		h.logger.Errorw("User registration failed", "email", req.Email, "error", err)
+		var appErr *errs.AppError
+		if errors.As(err, &appErr) {
+			return c.Status(appErr.StatusCode).JSON(fiber.Map{"message": appErr.Message})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	h.logger.Info("User registered successfully")
 	return c.Status(fiber.StatusCreated).JSON(createdUser)
 }
