@@ -1,4 +1,5 @@
 export interface User {
+	ID?: number;
 	id: number;
 	name: string;
 	email: string;
@@ -22,6 +23,7 @@ export interface Response<T> {
 	error?: string;
 	data?: T;
 	leaderboard?: T;
+	user?: T;
 	total: number;
 	page: number;
 	totalPages: number;

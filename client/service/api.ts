@@ -4,7 +4,7 @@ class Client {
 	private readonly baseUrl: string;
 
 	constructor() {
-		this.baseUrl = process.env.API_URL || 'http://localhost:8000';
+		this.baseUrl = process.env.API_URL || 'http://localhost:8080';
 	}
 
 	private async get<T>(end: string, options?: RequestInit): Promise<Response<T>> {
@@ -39,6 +39,10 @@ class Client {
 		return this.get<User[]>(end, {
 			method: 'GET',
 		});
+	}
+
+	async getShareLink(id: string): Promise<Response<User>> {
+		return this.get<User>(`/api/share/${id}`);
 	}
 }
 
