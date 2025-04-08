@@ -1,47 +1,182 @@
-# **TESTE BACKEND**
+# Carbon Offsets Awareness Program
 
-## SITUAÇÂO-PROBLEMA
-A ideia é construir uma página de competição muito simples que incentiva as pessoas a divulgarem notícias sobre compensações de carbono. Os usuários chegam à página e preenchem um formulário de inscrição. Após uma inscrição bem-sucedida, eles ganham um ponto para a competição. Neste momento, eles têm a opção de compartilhar o link de inscrição. Cada inscrição bem-sucedida feita através do link compartilhado dará pontos extras para o autor original do link. Não há limite para o número de pontos que uma pessoa pode obter. No final da competição, as 10 pessoas com mais pontos vencem.
+A gamified referral platform promoting carbon offset awareness.
 
----------------------------------------------------------------------
+## Table of Contents
 
-## REQUISITOS OBRIGATÓRIOS
-- O formulário de inscrição consiste em nome, e-mail e números de telefone;
-- Quando o formulário é enviado, o usuário ganha um ponto e será direcionado para uma página com opção de compartilhar o link especial;
-- Quando as pessoas chegam à página da competição através do link especial, o autor original ganha um ponto extra;
-- Após o término da competição, gerar uma tabela dos vencedores;
-- Enviar notificação via e-mail para os ganhadores e para cada vez que alguém fizer um ponto a partir do link filiado.
-- Seja original, projetos suspeitos de serem copiados serão descartados
-- Queremos ver seu codigo, não o de outros.
-- Criar coleção no Postman (seu teste será testado por aqui).
-- Criar um frontend que consuma a API(React)
+1. [Features](#features)
+2. [Architecture](#architecture)
+3. [Project Structure](#project-structure)
+4. [Prerequisites](#prerequisites)
+5. [Quick Start](#quick-start)
+6. [API Endpoints](#api-endpoints)
+7. [Make Commands](#make-commands)
+8. [Technologies](#technologies)
 
----------------------------------------------------------------------
+## Features
 
-## GIT
-- Faça um fork deste repositório.
-- Crie uma branch para codar as suas features.
-- Faça um pull-request quando o teste for finalizado.
+- Points-based gamification system
+- User referral tracking
+- Automated email notifications
+- Real-time leaderboard
+- Social sharing integration
+- Responsive design
+- Search and filtering capabilities
+- Pagination support
 
-##### **NOTA: Será avaliado também se o nome da branch, títulos de commit, push e comentários possuem boa legibilidade.**
+## Architecture
+```
+┌─────────────┐         ┌──────────┐
+│   Next.js   │ ──────► │   Gin    │
+│    Front    │         │  Backend │
+└─────────────┘         └──────────┘
+                             │
+                             ▼
+                       ┌──────────┐
+                       │ Docker   │
+                       └──────────┘
+                             │
+                             ▼
+                       ┌──────────┐
+                       │PostgreSQL│
+                       └──────────┘
+```
 
----------------------------------------------------------------------
+## Project Structure
 
-## FRAMEWORK
-- Servidor: Golang(Fiber ou Gin)
-- Banco de dados: MongoDB, DynamoDB, MySQL, Postgres...
+```
+vbio-test/
+├── client/          # Next.js front
+│   ├── app/         # Pages and routing
+│   ├── components/  # Shared components
+│   ├── services/    # API services
+│   └── types/       # TypeScript definitions
+├──   server /          #  GoGin backend
+│   ├── api/         # HTTP handlers & routes
+│   ├── internal/    # Business logic
+│   └── cmd/         # Entry points
+├── docker/
+└── Makefile
+```
 
--------------------------------------------------------
+## Prerequisites
 
-## REQUISITOS DIFERENCIAIS:
-- Seguir os princípios de SOLID.
-- Codar um código performático.
-- Utilizar inglês no projeto todo.
-- Utilizar Injeção de dependências.
-- Fazer deploy do mesmo (heroku, aws, google cloud ou outro da preferência).
+- Go 1.19+
+- Node.js 18+
+- Docker and Docker Compose
+- PostgreSQL
+- Make
 
-## ENTREGA
+## Quick Start
 
-- Faça um pull request e nomeie-o como no ex.: Teste de (Seu nome aqui).
-- Envie um email para morelli@gss.eco com o link do pull request, do deploy (tanto do front quanto do back se feito), e anexe a coleção do postman.
-- Assim que avaliarmos seu teste, enviaremos uma devolutiva de sucesso ou falha, e caso seja aprovado, um link para agendar sua entrevista técnica.
+1. Clone and setup:
+```bash
+git clone [repository-url]
+cd VBIO-test
+cp .env.example .env
+```
+
+2. Configure environment variables:
+```env
+DB_HOST=localhost
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_NAME=your_db_name
+DB_PORT=5432
+```
+
+3. Start services:
+```bash
+make install  # Installs dependencies and Docker containers
+make api     # Starts Go server
+make cli     # Starts Next.js dev server
+```
+
+## API Endpoints
+
+### Register User
+```http
+POST /api/register
+Body: {
+    "name": "string",
+    "email": "string",
+    "phone_number": "string",
+    "referral_code": "string" (optional)
+}
+```
+
+### Get Leaderboard
+```http
+GET /api/leaderboard
+Query: {
+    sort: "points" | "name" | "email",
+    search: string,
+    page: number
+}
+```
+
+### Get Share Link
+```http
+GET /api/share/:id
+```
+
+## Technologies
+
+### Front
+- Next.js 13+
+- React 18
+- TypeScript
+- TailwindCSS
+- React Hooks
+
+###   Backend 
+-  Go1.19+
+- Gin Framework
+- GORM
+- PostgreSQL
+
+### Tools
+- Docker
+- Make
+- Git
+
+### Dependencies
+
+#### Front Dependencies
+```json
+{
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "next": "^13.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
+```
+
+#### Back Dependencies
+```go
+require (
+    github.com/gin-gonic/gin v1.10.0
+    github.com/google/uuid v1.6.0
+    github.com/joho/godotenv v1.5.1
+    gorm.io/driver/postgres v1.5.11
+    gorm.io/gorm v1.25.12
+    github.com/golang-jwt/jwt/v5 v5.2.2
+    github.com/lib/pq v1.10.9
+)
+```
+
+#### Database
+- PostgreSQL 15+
+
+#### Development Tools
+- Docker Engine 24+
+- Docker Compose v2.22+
+- Make 4.3+
+- Git 2.34+
+
