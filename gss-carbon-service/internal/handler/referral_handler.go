@@ -24,6 +24,7 @@ func NewReferralsHandler(userService service.UserService, logger *zap.SugaredLog
 // GetReferrals returns a paginated list of referrals
 func (h *ReferralsHandler) GetReferrals(c *fiber.Ctx) error {
 	h.logger.Info("Get referrals request received")
+
 	pageParam := c.Query("page", "1")
 	pageSizeParam := c.Query("pageSize", "10")
 
@@ -42,13 +43,12 @@ func (h *ReferralsHandler) GetReferrals(c *fiber.Ctx) error {
 	referrals, err := h.userService.GetReferrals(context.Background(), offset, pageSize)
 	if err != nil {
 		h.logger.Errorw("Failed to get referrals", "error", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get referrals"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Failed to get referrals"})
 	}
 
 	if len(referrals) == 0 {
 		h.logger.Warn("No referrals found")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "no referrals found"})
 	}
-	
-	return c.JSON(referrals)
+
+	return c.Status(fiber.StatusOK).JSON(referrals)
 }

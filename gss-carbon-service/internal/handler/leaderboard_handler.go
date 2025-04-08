@@ -36,10 +36,10 @@ func (h *LeaderboardHandler) GetLeaderboard(c *fiber.Ctx) error {
 
 	users, err := h.leaderboardService.GetLeaderboard(context.Background(), limit)
 	if err != nil {
-		h.logger.Errorw("Failed to get leaderboard from service", "limit", limit, "error", err)
+		h.logger.Errorw("Failed to retrieve leaderboard", "limit", limit, "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to retrieve leaderboard"})
 	}
 
 	h.logger.Infow("Leaderboard retrieved successfully", "count", len(users))
-	return c.JSON(users)
+	return c.Status(fiber.StatusOK).JSON(users)
 }

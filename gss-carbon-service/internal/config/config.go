@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -18,9 +17,7 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	if err := godotenv.Load(); err != nil {
-		log.Printf("No .env file found or error loading it: %v", err)
-	}
+	_ = godotenv.Load()
 
 	cfg := &Config{
 		ServerPort:   getEnv("SERVER_PORT", "3000"),
@@ -34,7 +31,6 @@ func LoadConfig() (*Config, error) {
 	if cfg.DatabaseURL == "" {
 		return nil, errors.New("DATABASE_URL environment variable is required")
 	}
-
 	if cfg.SMTPHost == "" || cfg.SMTPUsername == "" || cfg.SMTPPassword == "" {
 		return nil, errors.New("SMTP_HOST, SMTP_USERNAME and SMTP_PASSWORD environment variables are required")
 	}

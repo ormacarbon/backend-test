@@ -17,52 +17,39 @@ import (
 func SetupRoutes(app *fiber.App, cfg *config.Config, logger *zap.SugaredLogger) {
 	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
 	if err != nil {
-		logger.Fatalw("Failed to connect database", "error", err)
+		logger.Fatalw("Database connection failed", "error", err)
 	}
-
-	logger.Info("Database connection established")
+	logger.Info("Database connected")
 
 	if err := migration.Migrate(db, logger); err != nil {
-		logger.Fatalw("Failed to run migrations", "error", err)
+		logger.Fatalw("Migration failed", "error", err)
 	}
 
 	// Repositories
-	userRepo := repository.NewUserRepository(db, logger)
+	userRepo := repository.NewUserRepository(db)
 
-	// --- Services ---
+	// Services
 	emailSvc := email.NewEmailService(cfg, logger)
-	userService := service.NewUserService(userRepo, emailSvc, logger)
-	competitionService := service.NewCompetitionService(userRepo, emailSvc, logger)
-	leaderboardService := service.NewLeaderboardService(userRepo, logger)
+	competitionSvc := service.NewCompetitionService(userRepo, emailSvc, logger)
+	leaderboardSvc := service.NewLeaderboardService(userRepo, logger)
+	userSvc := service.NewUserService(userRepo, emailSvc, logger)
 
-	// --- Handlers ---
+	// Handlers
 	healthHandler := handler.NewHealthHandler(db, logger)
-	userHandler := handler.NewUserHandler(userService, logger)
-	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService, logger)
-	competitionHandler := handler.NewCompetitionHandler(competitionService, logger)
-	referralHandler := handler.NewReferralsHandler(userService, logger)
+	userHandler := handler.NewUserHandler(userSvc, logger)
+	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardSvc, logger)
+	competitionHandler := handler.NewCompetitionHandler(competitionSvc, logger)
+	referralHandler := handler.NewReferralsHandler(userSvc, logger)
 
 	app.Use(middleware.SetupCors())
 
 	api := app.Group("/api")
-
-	// Health Check endpoints
 	api.Get("/health/ping", healthHandler.Ping)
 	api.Get("/health/check", healthHandler.Checker)
-
-	// Endpoints //
-
-	// User
 	api.Get("/user/:id", userHandler.GetUserByID)
 	api.Get("/user/referral/:token", userHandler.GetUserByReferralToken)
 	api.Post("/user/register", userHandler.RegisterUser)
-
-	// Leaderboard
 	api.Get("/leaderboard", leaderboardHandler.GetLeaderboard)
-
-	// Competition
 	api.Post("/competition/finish", competitionHandler.FinishCompetition)
-
-	// Referrals
 	api.Get("/referrals", referralHandler.GetReferrals)
 }

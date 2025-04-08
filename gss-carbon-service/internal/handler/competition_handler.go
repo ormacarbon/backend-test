@@ -21,7 +21,7 @@ func NewCompetitionHandler(competitionService service.CompetitionService, logger
 	}
 }
 
-// FinishCompetition finish the competition, sends notifications to winners and returns the list of winners.
+// FinishCompetition ends the competition, notifies winners, and returns the list of winners
 func (h *CompetitionHandler) FinishCompetition(c *fiber.Ctx) error {
 	h.logger.Info("Received request to finish competition")
 
@@ -36,10 +36,10 @@ func (h *CompetitionHandler) FinishCompetition(c *fiber.Ctx) error {
 
 	winners, err := h.competitionService.FinishCompetition(context.Background(), limit)
 	if err != nil {
-		h.logger.Errorw("Failed to finish competition in service", "limit", limit, "error", err)
+		h.logger.Errorw("Failed to finish competition", "limit", limit, "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to finish competition"})
 	}
 
 	h.logger.Infow("Competition finished successfully", "winnerCount", len(winners))
-	return c.JSON(winners)
+	return c.Status(fiber.StatusOK).JSON(winners)
 }

@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
+	"sync"
+
 	"github.com/icl00ud/backend-test/internal/email"
 	"github.com/icl00ud/backend-test/internal/model"
 	"github.com/icl00ud/backend-test/internal/repository"
 	"go.uber.org/zap"
-	"sync"
 )
 
 type CompetitionService interface {
@@ -30,6 +31,7 @@ func NewCompetitionService(userRepo repository.UserRepository, emailSvc email.Se
 func (s *competitionService) FinishCompetition(ctx context.Context, limit int) ([]model.User, error) {
 	winners, err := s.userRepo.GetTopUsers(ctx, limit)
 	if err != nil {
+		s.logger.Errorw("Error retrieving top users", "limit", limit, "error", err)
 		return nil, err
 	}
 
@@ -41,7 +43,6 @@ func (s *competitionService) FinishCompetition(ctx context.Context, limit int) (
 		wg.Add(1)
 		go func(u model.User) {
 			defer wg.Done()
-
 			data := struct {
 				Name   string
 				Points int
@@ -49,15 +50,15 @@ func (s *competitionService) FinishCompetition(ctx context.Context, limit int) (
 				Name:   u.Name,
 				Points: u.Points,
 			}
-
+			
 			s.emailSvc.Email(u.Email, subject, templatePath, data)
 		}(winner)
 	}
-
 	wg.Wait()
 
-	if err := s.userRepo.CleanTable(); err != nil {
-		s.logger.Errorw("Failed to clean user table after competition", "error", err)
+	// Clear the user table after sending emails
+	if err := s.userRepo.CleanTable(ctx); err != nil {
+		s.logger.Errorw("Failed to clean user table", "error", err)
 		return nil, err
 	}
 
