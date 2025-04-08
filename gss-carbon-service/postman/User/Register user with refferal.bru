@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:3000/api/register/referral
+  url: {{baseUrl}}/api/user/register
   body: json
   auth: none
 }
@@ -15,6 +15,6 @@ body:json {
     "name": "Jane Smith",
     "email": "jane.smith@example.com",
     "phone": "0987654321",
-    "referral_token": "ba6f5f0-6709-41d1-a387-9eb90def5803"
+    "referral_token": "3dce9d18-7d64-4715-a666-67596ee64cd6"
   }
 }
