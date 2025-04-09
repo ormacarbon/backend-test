@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "GSS Carbon",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

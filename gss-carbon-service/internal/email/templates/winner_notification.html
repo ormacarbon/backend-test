@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Congratulations, You're a Winner!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #d1fae5, #cffafe, #ecfeff);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 40px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header {
+            font-size: 26px;
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            font-size: 16px;
+            color: #1e293b;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .content p {
+            margin: 15px 0;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 30px;
+        }
+
+        .award-icon {
+            font-size: 48px;
+            color: #d97706;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="award-icon">🏆</div>
+    <div class="header">Congratulations, {{.Name}}!</div>
+    <div class="content">
+        <p>You are one of the top winners in our Carbon Offset Competition!</p>
+        <p>Your outstanding effort in spreading awareness has earned you an exclusive reward.</p>
+        <p>You now have <strong>{{.Points}}</strong> points.</p>
+        <p>We are excited to celebrate your success and look forward to seeing you continue making a difference.</p>
+    </div>
+    <div class="footer">
+        <p>Keep up the great work and continue sharing to earn even more rewards!</p>
+    </div>
+</div>
+</body>
+</html>

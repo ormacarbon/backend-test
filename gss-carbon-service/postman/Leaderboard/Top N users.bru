@@ -1,0 +1,15 @@
+meta {
+  name: Top N users
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/leaderboard?limit=10
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 10
+}

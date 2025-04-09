@@ -1,0 +1,20 @@
+meta {
+  name: Register user with refferal
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/user/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "phone": "0987654321",
+    "referral_token": "3dce9d18-7d64-4715-a666-67596ee64cd6"
+  }
+}
